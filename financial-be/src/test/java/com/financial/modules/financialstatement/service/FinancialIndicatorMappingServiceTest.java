@@ -219,7 +219,80 @@ class FinancialIndicatorMappingServiceTest {
         assertThat(item100.getMappingStatus()).isEqualTo(MappingStatus.MATCHED);
 
         FinancialStatementItem item999 = items.stream().filter(i -> "999".equals(i.getCode())).findFirst().orElseThrow();
-        assertThat(item999.getMappingStatus()).isEqualTo(MappingStatus.NEEDS_REVIEW);
+        assertThat(item999.getMappingStatus()).isEqualTo(MappingStatus.UNMAPPED);
+    }
+
+    @Test
+    @DisplayName("Should parse and map actual Vinamilk sample JSON (response_1793547660260.json) under TT99")
+    void mapRealSampleVinamilkTT99Json_Success() throws Exception {
+        java.nio.file.Path samplePath = java.nio.file.Paths.get("docs", "response_1793547660260.json");
+        if (!java.nio.file.Files.exists(samplePath)) {
+            samplePath = java.nio.file.Paths.get("..", "docs", "response_1793547660260.json");
+        }
+        assertThat(java.nio.file.Files.exists(samplePath)).isTrue();
+
+        String json = java.nio.file.Files.readString(samplePath);
+        List<FinancialStatementItem> items = mappingService.mapOcrResponse(statement, json);
+
+        assertThat(items).hasSize(163);
+        assertThat(statement.getAccountingStandard()).isEqualTo("TT99");
+
+        // Verify key balance sheet items
+        FinancialStatementItem currentAssets = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.BALANCE_SHEET && "CURRENT_ASSETS".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(currentAssets.getCurrentValue()).isEqualByComparingTo("29403116984122");
+        assertThat(currentAssets.getMappingStatus()).isEqualTo(MappingStatus.MATCHED);
+
+        FinancialStatementItem totalAssets = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.BALANCE_SHEET && "TOTAL_ASSETS".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(totalAssets.getCurrentValue()).isEqualByComparingTo("47775826926383");
+
+        FinancialStatementItem liabilities = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.BALANCE_SHEET && "TOTAL_LIABILITIES".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(liabilities.getCurrentValue()).isEqualByComparingTo("16666572149360");
+
+        FinancialStatementItem equity = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.BALANCE_SHEET && "EQUITY".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(equity.getCurrentValue()).isEqualByComparingTo("31109254777023");
+
+        // Verify balance sheet equation: Total Assets == Total Liabilities + Equity
+        BigDecimal totalLAndE = liabilities.getCurrentValue().add(equity.getCurrentValue());
+        assertThat(totalAssets.getCurrentValue()).isEqualByComparingTo(totalLAndE);
+
+        // Verify income statement items
+        FinancialStatementItem revenue = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.INCOME_STATEMENT && "NET_REVENUE".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(revenue.getCurrentValue()).isEqualByComparingTo("13217639635987");
+
+        FinancialStatementItem cogs = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.INCOME_STATEMENT && "COST_OF_GOODS_SOLD".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(cogs.getCurrentValue()).isEqualByComparingTo("7278764406353");
+
+        FinancialStatementItem grossProfit = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.INCOME_STATEMENT && "GROSS_PROFIT".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(grossProfit.getCurrentValue()).isEqualByComparingTo("5938875229634");
+
+        // Equation check: Net Revenue - COGS == Gross Profit
+        BigDecimal calculatedGP = revenue.getCurrentValue().subtract(cogs.getCurrentValue());
+        assertThat(grossProfit.getCurrentValue()).isEqualByComparingTo(calculatedGP);
+
+        // Verify cash flow items
+        FinancialStatementItem netFinCash = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.CASH_FLOW && "NET_CASH_FROM_FINANCING".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(netFinCash.getCurrentValue()).isEqualByComparingTo("1038925762460");
+
+        FinancialStatementItem endingCash = items.stream()
+                .filter(i -> i.getStatementType() == FinancialStatementType.CASH_FLOW && "ENDING_CASH".equals(i.getKey()))
+                .findFirst().orElseThrow();
+        assertThat(endingCash.getCurrentValue()).isEqualByComparingTo("1362241151028");
     }
 }
 

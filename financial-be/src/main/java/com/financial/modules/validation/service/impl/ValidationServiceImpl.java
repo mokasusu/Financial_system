@@ -68,8 +68,13 @@ public class ValidationServiceImpl implements ValidationService {
             throw new InvalidStatementStatusException("Financial statement does not contain any indicator items to validate.");
         }
 
-        // Attach loaded items to statement instance
-        statement.setItems(items);
+        // Attach loaded items to statement instance without breaking Hibernate's persistent collection reference
+        if (statement.getItems() == null) {
+            statement.setItems(new ArrayList<>());
+        } else {
+            statement.getItems().clear();
+        }
+        statement.getItems().addAll(items);
 
         // Execute rule validation engine
         List<ValidationResult> results = ruleEngine.executeValidation(statement);

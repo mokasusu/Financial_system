@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.financial.modules.assessment.enums.HealthClassification;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -17,6 +19,15 @@ public class DashboardOverviewResponse {
 
     @Schema(description = "Global context identifying company and financial statement")
     private DashboardContextResponse context;
+
+    @Schema(description = "Overall financial health score (0-100)", example = "88.5")
+    private BigDecimal overallScore;
+
+    @Schema(description = "Overall financial health classification level", example = "SAFE")
+    private HealthClassification healthClassification;
+
+    @Schema(description = "Display name of health classification", example = "AN TOÀN")
+    private String healthClassificationDisplayName;
 
     @Schema(description = "Data availability statuses across all upstream subsystems")
     private DashboardDataStatusDTO dataStatuses;

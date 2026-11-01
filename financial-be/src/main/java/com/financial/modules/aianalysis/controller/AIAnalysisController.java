@@ -58,6 +58,23 @@ public class AIAnalysisController {
                 .body(ApiResponse.success("AI analysis generation initiated", response));
     }
 
+    @PostMapping("/statements/{statementId}/generate")
+    @Operation(
+            summary = "Generate or regenerate AI financial analysis by statement ID",
+            description = "Triggers or regenerates AI-driven financial commentary directly using statement ID. Returns 202 Accepted."
+    )
+    public ResponseEntity<ApiResponse<AIAnalysisResponse>> generateAIAnalysisByStatement(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @Parameter(description = "Financial Statement ID", example = "1")
+            @PathVariable Long statementId,
+            @Valid @RequestBody(required = false) AIAnalysisGenerateRequest request
+    ) {
+        AIAnalysisResponse response = aiAnalysisService.generateAIAnalysisForStatement(userPrincipal.getId(), statementId, request);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(ApiResponse.success("Tạo nhận định AI thành công", response));
+    }
+
     @GetMapping("/assessments/{assessmentId}/latest")
     @Operation(
             summary = "Get latest AI analysis for assessment",
@@ -135,6 +152,21 @@ public class AIAnalysisController {
     ) {
         AIAnalysisResponse response = aiAnalysisService.updateFinalComment(userPrincipal.getId(), analysisId, request);
         return ResponseEntity.ok(ApiResponse.success("Final comment updated successfully", response));
+    }
+
+    @PutMapping("/statements/{statementId}/final-comment")
+    @Operation(
+            summary = "Update user-edited commentary directly by statement ID",
+            description = "Updates user-edited commentary for the statement's latest completed AI analysis."
+    )
+    public ResponseEntity<ApiResponse<AIAnalysisResponse>> updateFinalCommentByStatement(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @Parameter(description = "Financial Statement ID", example = "1")
+            @PathVariable Long statementId,
+            @Valid @RequestBody AIAnalysisFinalCommentRequest request
+    ) {
+        AIAnalysisResponse response = aiAnalysisService.updateFinalCommentForStatement(userPrincipal.getId(), statementId, request);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật nhận định thành công", response));
     }
 
     @PostMapping("/{analysisId}/approve")

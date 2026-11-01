@@ -24,6 +24,8 @@ public interface AIAnalysisRepository extends JpaRepository<AIAnalysis, Long> {
 
     Optional<AIAnalysis> findFirstByAssessmentIdAndStatusIn(Long assessmentId, Collection<AIAnalysisStatus> statuses);
 
+    List<AIAnalysis> findByFinancialStatementId(Long financialStatementId);
+
     int countByAssessmentId(Long assessmentId);
 }
 

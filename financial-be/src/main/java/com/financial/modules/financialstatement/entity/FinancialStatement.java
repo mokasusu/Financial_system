@@ -58,6 +58,12 @@ public class FinancialStatement {
     @Column(name = "as_of_date")
     private LocalDate asOfDate;
 
+    @Column(name = "current_period_label")
+    private String currentPeriodLabel;
+
+    @Column(name = "previous_period_label")
+    private String previousPeriodLabel;
+
     @Column(name = "unit")
     private String unit;
 

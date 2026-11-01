@@ -48,6 +48,15 @@ public class FinancialStatementResponse {
     @Schema(description = "As of reporting date", example = "2023-12-31")
     private LocalDate asOfDate;
 
+    @Schema(description = "Real current reporting period label extracted from OCR", example = "31/03/2026")
+    private String currentPeriodLabel;
+
+    @Schema(description = "Real previous reporting period label extracted from OCR", example = "01/01/2026")
+    private String previousPeriodLabel;
+
+    @Schema(description = "Direct stream URL for uploaded original document", example = "/api/financial-statements/1/file")
+    private String fileUrl;
+
     @Schema(description = "Currency unit of measure", example = "VND")
     private String unit;
 

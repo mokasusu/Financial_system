@@ -231,6 +231,29 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
         return mapper.toAnalysisResponse(saved);
     }
 
+    @Override
+    @Transactional
+    public AIAnalysisResponse generateAIAnalysisForStatement(Long userId, Long statementId, AIAnalysisGenerateRequest request) {
+        Company company = getOwnedCompany(userId);
+        Assessment assessment = assessmentRepository.findTopByFinancialStatementIdOrderByAssessmentVersionDesc(statementId)
+                .orElseThrow(() -> new UpstreamDataUnavailableException("ASSESSMENT",
+                        "Chưa có hồ sơ đánh giá sức khỏe cho báo cáo ID: " + statementId + ". Vui lòng chạy tính toán thẩm định trước."));
+
+        return generateAIAnalysis(userId, assessment.getId(), request);
+    }
+
+    @Override
+    @Transactional
+    public AIAnalysisResponse updateFinalCommentForStatement(Long userId, Long statementId, AIAnalysisFinalCommentRequest request) {
+        Company company = getOwnedCompany(userId);
+        List<AIAnalysis> list = aiAnalysisRepository.findByFinancialStatementId(statementId);
+        if (list.isEmpty()) {
+            throw new AIAnalysisNotFoundException("Không tìm thấy nhận định AI cho báo cáo ID: " + statementId);
+        }
+        AIAnalysis latest = list.get(list.size() - 1);
+        return updateFinalComment(userId, latest.getId(), request);
+    }
+
     private Company getOwnedCompany(Long userId) {
         return companyRepository.findByUserIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new StatementNotFoundException("User does not have an associated active company"));

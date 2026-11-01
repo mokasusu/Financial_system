@@ -3,6 +3,12 @@ package com.financial.modules.financialstatement.service.impl;
 import com.financial.common.config.OcrProperties;
 import com.financial.common.exception.*;
 import com.financial.common.response.PageResponse;
+import com.financial.modules.aianalysis.entity.AIAnalysis;
+import com.financial.modules.aianalysis.repository.AIAnalysisRepository;
+import com.financial.modules.assessment.entity.Assessment;
+import com.financial.modules.assessment.repository.AssessmentRepository;
+import com.financial.modules.calculationengine.entity.FinancialCalculation;
+import com.financial.modules.calculationengine.repository.FinancialCalculationRepository;
 import com.financial.modules.company.entity.Company;
 import com.financial.modules.company.repository.CompanyRepository;
 import com.financial.modules.financialstatement.dto.*;
@@ -16,10 +22,16 @@ import com.financial.modules.financialstatement.repository.FinancialStatementIte
 import com.financial.modules.financialstatement.repository.FinancialStatementRepository;
 import com.financial.modules.financialstatement.service.FinancialStatementService;
 import com.financial.modules.financialstatement.service.OcrIntegrationService;
+import com.financial.modules.riskanalysis.entity.RiskAnalysis;
+import com.financial.modules.riskanalysis.repository.RiskAnalysisRepository;
 import com.financial.modules.user.entity.User;
 import com.financial.modules.user.repository.UserRepository;
+import com.financial.modules.validation.entity.ValidationExecution;
+import com.financial.modules.validation.repository.ValidationExecutionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,6 +63,11 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
     private final OcrIntegrationService ocrIntegrationService;
     private final FinancialStatementMapper statementMapper;
     private final OcrProperties ocrProperties;
+    private final AIAnalysisRepository aiAnalysisRepository;
+    private final AssessmentRepository assessmentRepository;
+    private final RiskAnalysisRepository riskAnalysisRepository;
+    private final FinancialCalculationRepository calculationRepository;
+    private final ValidationExecutionRepository validationExecutionRepository;
 
     public FinancialStatementServiceImpl(
             FinancialStatementRepository statementRepository,
@@ -60,7 +77,12 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
             UserRepository userRepository,
             OcrIntegrationService ocrIntegrationService,
             FinancialStatementMapper statementMapper,
-            OcrProperties ocrProperties) {
+            OcrProperties ocrProperties,
+            AIAnalysisRepository aiAnalysisRepository,
+            AssessmentRepository assessmentRepository,
+            RiskAnalysisRepository riskAnalysisRepository,
+            FinancialCalculationRepository calculationRepository,
+            ValidationExecutionRepository validationExecutionRepository) {
         this.statementRepository = statementRepository;
         this.itemRepository = itemRepository;
         this.draftRepository = draftRepository;
@@ -69,6 +91,11 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
         this.ocrIntegrationService = ocrIntegrationService;
         this.statementMapper = statementMapper;
         this.ocrProperties = ocrProperties;
+        this.aiAnalysisRepository = aiAnalysisRepository;
+        this.assessmentRepository = assessmentRepository;
+        this.riskAnalysisRepository = riskAnalysisRepository;
+        this.calculationRepository = calculationRepository;
+        this.validationExecutionRepository = validationExecutionRepository;
     }
 
     @Override
@@ -122,6 +149,22 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
     }
 
     @Override
+    @Transactional
+    public FinancialStatementStatusResponse triggerExtraction(Long userId, Long statementId) {
+        FinancialStatement statement = getOwnedStatement(userId, statementId);
+
+        statement.setProcessingStatus(FinancialStatementStatus.QUEUED);
+        statement.setErrorMessage(null);
+        statement.setErrorCode(null);
+        FinancialStatement saved = statementRepository.save(statement);
+
+        log.info("Triggering OCR extraction for statement ID: {}", statementId);
+        ocrIntegrationService.processFinancialStatementAsync(saved.getId());
+
+        return statementMapper.toStatusResponse(saved);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public FinancialStatementStatusResponse getFinancialStatementStatus(Long userId, Long statementId) {
         FinancialStatement statement = getOwnedStatement(userId, statementId);
@@ -133,6 +176,27 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
     public FinancialStatementResponse getFinancialStatement(Long userId, Long statementId) {
         FinancialStatement statement = getOwnedStatement(userId, statementId);
         return statementMapper.toResponse(statement);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StatementFileDownload getStatementFile(Long userId, Long statementId) {
+        FinancialStatement statement = getOwnedStatement(userId, statementId);
+        if (statement.getFilePath() == null || statement.getFilePath().isBlank()) {
+            throw new StatementNotFoundException("Document file path not recorded for statement ID: " + statementId);
+        }
+
+        File file = new File(statement.getFilePath());
+        if (!file.exists()) {
+            throw new StatementNotFoundException("Document file not found on disk at: " + statement.getFilePath());
+        }
+
+        Resource resource = new FileSystemResource(file);
+        String contentType = statement.getContentType() != null && !statement.getContentType().isBlank()
+                ? statement.getContentType()
+                : "application/pdf";
+
+        return new StatementFileDownload(resource, statement.getFileName(), contentType);
     }
 
     @Override
@@ -363,6 +427,61 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
         } catch (IOException e) {
             throw new RuntimeException("Failed to store uploaded financial statement file locally: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteFinancialStatement(Long userId, Long statementId) {
+        FinancialStatement statement = getOwnedStatement(userId, statementId);
+
+        log.info("Deleting financial statement session ID {} and associated downstream entities for user ID {}", statementId, userId);
+
+        // 1. Delete AI Analysis
+        List<AIAnalysis> aiAnalyses = aiAnalysisRepository.findByFinancialStatementId(statementId);
+        if (!aiAnalyses.isEmpty()) {
+            aiAnalysisRepository.deleteAll(aiAnalyses);
+        }
+
+        // 2. Delete Assessments
+        List<Assessment> assessments = assessmentRepository.findByFinancialStatementIdOrderByAssessmentVersionDesc(statementId);
+        if (!assessments.isEmpty()) {
+            assessmentRepository.deleteAll(assessments);
+        }
+
+        // 3. Delete Risk Analyses
+        List<RiskAnalysis> riskAnalyses = riskAnalysisRepository.findByFinancialStatementIdOrderByAnalysisVersionDesc(statementId);
+        if (!riskAnalyses.isEmpty()) {
+            riskAnalysisRepository.deleteAll(riskAnalyses);
+        }
+
+        // 4. Delete Calculations
+        List<FinancialCalculation> calculations = calculationRepository.findByFinancialStatementIdOrderByCalculationVersionDesc(statementId);
+        if (!calculations.isEmpty()) {
+            calculationRepository.deleteAll(calculations);
+        }
+
+        // 5. Delete Validation Executions
+        List<ValidationExecution> validations = validationExecutionRepository.findByFinancialStatementIdOrderByExecutedAtDesc(statementId);
+        if (!validations.isEmpty()) {
+            validationExecutionRepository.deleteAll(validations);
+        }
+
+        // 6. Delete physical document file on disk if exists
+        if (statement.getFilePath() != null && !statement.getFilePath().isBlank()) {
+            try {
+                File file = new File(statement.getFilePath());
+                if (file.exists() && file.isFile()) {
+                    boolean deleted = file.delete();
+                    log.info("Deleted physical file for statement ID {}: {}", statementId, deleted);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to delete physical file on disk for statement ID {}: {}", statementId, e.getMessage());
+            }
+        }
+
+        // 7. Delete Statement (cascades to items and item drafts)
+        statementRepository.delete(statement);
+        log.info("Financial statement session ID {} deleted successfully", statementId);
     }
 }
 

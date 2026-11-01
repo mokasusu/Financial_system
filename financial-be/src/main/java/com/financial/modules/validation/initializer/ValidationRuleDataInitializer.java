@@ -7,7 +7,6 @@ import com.financial.modules.validation.enums.ToleranceType;
 import com.financial.modules.validation.enums.ValidationCategory;
 import com.financial.modules.validation.enums.ValidationSeverity;
 import com.financial.modules.validation.repository.ValidationRuleRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -20,10 +19,13 @@ import java.math.BigDecimal;
 @Slf4j
 @Component
 @Order(3)
-@RequiredArgsConstructor
 public class ValidationRuleDataInitializer implements ApplicationRunner {
 
     private final ValidationRuleRepository ruleRepository;
+
+    public ValidationRuleDataInitializer(ValidationRuleRepository ruleRepository) {
+        this.ruleRepository = ruleRepository;
+    }
 
     @Override
     @Transactional
@@ -123,11 +125,11 @@ public class ValidationRuleDataInitializer implements ApplicationRunner {
                 ToleranceType.ABSOLUTE
         );
 
-        // 3. TT99 Rules
+        // 3. TT99 Rules (Circular 99/2025/TT-BTC)
         seedRule(
                 "BS_EQ_TT99_01",
                 "Cân đối Bảng cân đối kế toán TT99",
-                "Kiểm tra phương trình cân đối kế toán theo Quyết định/Thông tư 99",
+                "Kiểm tra phương trình cân đối kế toán: Tổng tài sản = Tổng nợ phải trả + Vốn chủ sở hữu theo Thông tư 99/2025/TT-BTC",
                 AccountingStandard.TT99,
                 FinancialStatementType.BALANCE_SHEET,
                 ValidationCategory.ACCOUNTING_EQUATION,
@@ -135,6 +137,58 @@ public class ValidationRuleDataInitializer implements ApplicationRunner {
                 null,
                 BigDecimal.ZERO,
                 ToleranceType.ABSOLUTE
+        );
+
+        seedRule(
+                "BS_SUB_TT99_01",
+                "Tổng tài sản = Tài sản ngắn hạn + Tài sản dài hạn (TT99)",
+                "Kiểm tra tổng phụ: Tổng tài sản (280) bằng Tài sản ngắn hạn (100) cộng Tài sản dài hạn (200) theo TT99",
+                AccountingStandard.TT99,
+                FinancialStatementType.BALANCE_SHEET,
+                ValidationCategory.BALANCE_SHEET_SUBTOTAL,
+                ValidationSeverity.HIGH,
+                "{\"parent\": \"TOTAL_ASSETS\", \"components\": [\"CURRENT_ASSETS\", \"NON_CURRENT_ASSETS\"]}",
+                BigDecimal.ZERO,
+                ToleranceType.ABSOLUTE
+        );
+
+        seedRule(
+                "IS_GP_TT99_01",
+                "Lợi nhuận gộp = Doanh thu thuần - Giá vốn (TT99)",
+                "Kiểm tra quan hệ kết quả kinh doanh: Lợi nhuận gộp (20) = Doanh thu thuần (10) - Giá vốn hàng bán (11) theo TT99",
+                AccountingStandard.TT99,
+                FinancialStatementType.INCOME_STATEMENT,
+                ValidationCategory.INCOME_STATEMENT,
+                ValidationSeverity.HIGH,
+                "{\"result\": \"GROSS_PROFIT\", \"minuend\": \"NET_REVENUE\", \"subtrahend\": \"COST_OF_GOODS_SOLD\"}",
+                BigDecimal.ZERO,
+                ToleranceType.ABSOLUTE
+        );
+
+        seedRule(
+                "CP_NEG_TT99_01",
+                "Kiểm tra giá trị âm bất thường (TT99)",
+                "Phát hiện giá trị âm bất thường trong các chỉ tiêu tài sản, tồn kho và doanh thu theo TT99",
+                AccountingStandard.TT99,
+                FinancialStatementType.BALANCE_SHEET,
+                ValidationCategory.CROSS_PERIOD,
+                ValidationSeverity.HIGH,
+                "{\"checkType\": \"NEGATIVE_CHECK\", \"indicators\": [\"TOTAL_ASSETS\", \"CURRENT_ASSETS\", \"INVENTORY\", \"CASH_AND_EQUIVALENTS\", \"NET_REVENUE\"]}",
+                BigDecimal.ZERO,
+                ToleranceType.ABSOLUTE
+        );
+
+        seedRule(
+                "CP_FLUC_TT99_01",
+                "Cảnh báo biến động mạnh liên kỳ (TT99)",
+                "Cảnh báo khi các chỉ tiêu tài sản và doanh thu có mức biến động liên kỳ vượt quá 200% theo TT99",
+                AccountingStandard.TT99,
+                FinancialStatementType.BALANCE_SHEET,
+                ValidationCategory.CROSS_PERIOD,
+                ValidationSeverity.MEDIUM,
+                "{\"checkType\": \"FLUCTUATION_CHECK\", \"indicators\": [\"TOTAL_ASSETS\", \"NET_REVENUE\", \"CURRENT_ASSETS\"], \"maxChangePercent\": 200.0}",
+                new BigDecimal("200.0"),
+                ToleranceType.PERCENTAGE
         );
 
         // 4. Universal Rules

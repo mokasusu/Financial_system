@@ -9,7 +9,6 @@ import com.financial.modules.validation.entity.ValidationResult;
 import com.financial.modules.validation.entity.ValidationRule;
 import com.financial.modules.validation.enums.ValidationCategory;
 import com.financial.modules.validation.enums.ValidationStatus;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +18,13 @@ import java.util.List;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class OcrDataQualityValidator implements CategoryValidator {
 
     private final ObjectMapper objectMapper;
+
+    public OcrDataQualityValidator(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public ValidationCategory getCategory() {
@@ -54,7 +56,11 @@ public class OcrDataQualityValidator implements CategoryValidator {
         List<String> sourcePages = new ArrayList<>();
 
         for (FinancialStatementItem item : items) {
-            String itemDesc = (item.getCode() != null ? item.getCode() : item.getRawLabel());
+            String itemDesc = (item.getCode() != null && !item.getCode().isBlank())
+                    ? item.getCode()
+                    : (item.getLabel() != null && !item.getLabel().isBlank()
+                            ? item.getLabel()
+                            : (item.getRawLabel() != null && !item.getRawLabel().isBlank() ? item.getRawLabel() : "Chỉ tiêu không mã"));
             if (item.getSourcePage() != null && !sourcePages.contains(String.valueOf(item.getSourcePage()))) {
                 sourcePages.add(String.valueOf(item.getSourcePage()));
             }
@@ -95,13 +101,16 @@ public class OcrDataQualityValidator implements CategoryValidator {
         if (hasIssues) {
             StringBuilder sb = new StringBuilder();
             if (!unmappedItems.isEmpty()) {
-                sb.append("Có ").append(unmappedItems.size()).append(" chỉ tiêu chưa ánh xạ chuẩn: ").append(String.join(", ", unmappedItems)).append(". ");
+                sb.append("Có ").append(unmappedItems.size()).append(" chỉ tiêu chưa ánh xạ chuẩn: ")
+                        .append(formatSampleList(unmappedItems, 8)).append(". ");
             }
             if (!reviewItems.isEmpty()) {
-                sb.append("Có ").append(reviewItems.size()).append(" chỉ tiêu cần kiểm tra lại ánh xạ: ").append(String.join(", ", reviewItems)).append(". ");
+                sb.append("Có ").append(reviewItems.size()).append(" chỉ tiêu cần kiểm tra lại ánh xạ: ")
+                        .append(formatSampleList(reviewItems, 8)).append(". ");
             }
             if (!lowConfidenceItems.isEmpty()) {
-                sb.append("Có ").append(lowConfidenceItems.size()).append(" chỉ tiêu độ tin cậy thấp (< ").append(minConfidence).append("): ").append(String.join(", ", lowConfidenceItems)).append(". ");
+                sb.append("Có ").append(lowConfidenceItems.size()).append(" chỉ tiêu độ tin cậy thấp (< ").append(minConfidence).append("): ")
+                        .append(formatSampleList(lowConfidenceItems, 6)).append(". ");
             }
             if (!ocrWarnings.isEmpty()) {
                 sb.append("Cảnh báo OCR gốc: ").append(String.join("; ", ocrWarnings)).append(".");
@@ -131,6 +140,14 @@ public class OcrDataQualityValidator implements CategoryValidator {
                 .sourcePages(String.join(",", sourcePages))
                 .explanation("Dữ liệu OCR đạt tiêu chuẩn chất lượng: 100% chỉ tiêu được ánh xạ chuẩn và độ tin cậy đều trên ngưỡng cho phép.")
                 .build();
+    }
+
+    private String formatSampleList(List<String> list, int maxItems) {
+        if (list.size() <= maxItems) {
+            return String.join(", ", list);
+        }
+        List<String> sub = list.subList(0, maxItems);
+        return String.join(", ", sub) + String.format(" (và %d mục khác)", list.size() - maxItems);
     }
 }
 

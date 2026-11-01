@@ -94,11 +94,11 @@ public class OcrApiClient {
                 : Duration.ofSeconds(600);
 
         try {
-            log.info("Sending OCR request for file '{}' (size: {} bytes) with timeout: {}s",
+            log.info("Sending OCR extraction request for file '{}' (size: {} bytes) with timeout: {}s",
                     fileName, fileBytes.length, timeout.toSeconds());
 
             String responseBody = webClient.post()
-                    .uri("/api/v1/analyze")
+                    .uri("/api/v1/extract")
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(builder.build()))
                     .retrieve()

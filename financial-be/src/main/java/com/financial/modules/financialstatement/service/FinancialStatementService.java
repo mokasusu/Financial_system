@@ -3,6 +3,7 @@ package com.financial.modules.financialstatement.service;
 import com.financial.common.response.PageResponse;
 import com.financial.modules.financialstatement.dto.*;
 import com.financial.modules.financialstatement.enums.FinancialStatementStatus;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,12 +11,18 @@ import java.util.List;
 
 public interface FinancialStatementService {
 
+    record StatementFileDownload(Resource resource, String filename, String contentType) {}
+
+    StatementFileDownload getStatementFile(Long userId, Long statementId);
+
     FinancialStatementUploadResponse uploadFinancialStatement(
             Long userId,
             MultipartFile file,
             String period,
             Boolean enableAi,
             Boolean storeImages);
+
+    FinancialStatementStatusResponse triggerExtraction(Long userId, Long statementId);
 
     FinancialStatementStatusResponse getFinancialStatementStatus(Long userId, Long statementId);
 
@@ -40,5 +47,7 @@ public interface FinancialStatementService {
             String period,
             FinancialStatementStatus status,
             Pageable pageable);
+
+    void deleteFinancialStatement(Long userId, Long statementId);
 }
 

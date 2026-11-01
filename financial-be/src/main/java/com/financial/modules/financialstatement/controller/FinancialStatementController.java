@@ -16,6 +16,8 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -71,6 +73,27 @@ public class FinancialStatementController {
                 .body(ApiResponse.success("Financial statement uploaded and queued for processing", response));
     }
 
+    @PostMapping("/{id}/extract")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @Operation(
+            summary = "Trigger OCR extraction",
+            description = "Triggers or retries background OCR extraction via /api/v1/extract for an uploaded financial statement."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description = "Extraction queued successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Financial statement not found")
+    })
+    public ResponseEntity<ApiResponse<FinancialStatementStatusResponse>> triggerExtraction(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long id) {
+
+        FinancialStatementStatusResponse response = financialStatementService.triggerExtraction(userPrincipal.getId(), id);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(ApiResponse.success("OCR extraction triggered and queued", response));
+    }
+
     @GetMapping("/{id}/status")
     @Operation(
             summary = "Get processing lifecycle status",
@@ -105,6 +128,27 @@ public class FinancialStatementController {
 
         FinancialStatementResponse response = financialStatementService.getFinancialStatement(userPrincipal.getId(), id);
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/{id}/file")
+    @Operation(
+            summary = "View or download uploaded original financial statement document",
+            description = "Streams the original uploaded file (PDF/Image) with Content-Disposition inline for browser viewing."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "File streamed successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Statement or file not found")
+    })
+    public ResponseEntity<Resource> getStatementFile(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long id) {
+
+        FinancialStatementService.StatementFileDownload download = financialStatementService.getStatementFile(userPrincipal.getId(), id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(download.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + download.filename() + "\"")
+                .body(download.resource());
     }
 
     @GetMapping("/{id}/items")
@@ -233,6 +277,24 @@ public class FinancialStatementController {
                 userPrincipal.getId(), fiscalYear, period, status, pageable
         );
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Delete financial statement session",
+            description = "Permanently deletes a financial statement session, its extracted indicators, draft edits, downstream calculations, validations, risk assessments, AI commentary, and uploaded physical file."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Statement session deleted successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Financial statement not found")
+    })
+    public ResponseEntity<ApiResponse<Void>> deleteFinancialStatement(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long id) {
+
+        financialStatementService.deleteFinancialStatement(userPrincipal.getId(), id);
+        return ResponseEntity.ok(ApiResponse.success("Xóa phiên báo cáo tài chính thành công", null));
     }
 }
 

@@ -1,0 +1,3011 @@
+{
+  "success": true,
+  "schema_version": "2.0",
+  "request_id": "0f3991f1e5044b22b099c8fd5aa090e4",
+  "generated_at": "2026-11-01T15:40:59.748859+00:00",
+  "error": null,
+  "accounting_standard": {
+    "code": "TT99",
+    "name": "Thông tư 99/2025/TT-BTC"
+  },
+  "company": {
+    "name": "Công ty C phn Sa Vit Nam",
+    "tax_code": null,
+    "fiscal_year": 2026,
+    "period": "FY",
+    "period_label": "Năm 2026",
+    "as_of_date": "2026-03-31",
+    "unit": "VND"
+  },
+  "document": {
+    "file_name": "Test2.pdf",
+    "total_pages": 9,
+    "extraction_status": "COMPLETED",
+    "needs_review": false,
+    "extraction_method": "PDF / OCR Hybrid",
+    "processing_time_seconds": 519.081,
+    "pages": [
+      {
+        "page": 1,
+        "method": "paddle_ocr",
+        "status": "complete",
+        "ocr_confidence": 0.9332,
+        "needs_review": false,
+        "warnings": [
+          "Page had only 47 native chars (below threshold 50)."
+        ]
+      },
+      {
+        "page": 2,
+        "method": "hybrid",
+        "status": "complete",
+        "ocr_confidence": 0.942,
+        "needs_review": false,
+        "warnings": [
+          "Mixed content detected: native text present (92 chars, 2 numbers), but embedded image region (100.0% page area) contains missing table/scanned content."
+        ]
+      },
+      {
+        "page": 3,
+        "method": "paddle_ocr",
+        "status": "complete",
+        "ocr_confidence": 0.9636,
+        "needs_review": false,
+        "warnings": [
+          "Page had only 15 native chars (below threshold 50)."
+        ]
+      },
+      {
+        "page": 4,
+        "method": "paddle_ocr",
+        "status": "complete",
+        "ocr_confidence": 0.9604,
+        "needs_review": false,
+        "warnings": [
+          "Page had only 5 native chars (below threshold 50)."
+        ]
+      },
+      {
+        "page": 5,
+        "method": "hybrid",
+        "status": "complete",
+        "ocr_confidence": 0.968,
+        "needs_review": false,
+        "warnings": [
+          "Mixed content detected: native text present (69 chars, 1 numbers), but embedded image region (100.0% page area) contains missing table/scanned content."
+        ]
+      },
+      {
+        "page": 6,
+        "method": "hybrid",
+        "status": "complete",
+        "ocr_confidence": 0.967,
+        "needs_review": false,
+        "warnings": [
+          "Mixed content detected: native text present (84 chars, 2 numbers), but embedded image region (100.0% page area) contains missing table/scanned content."
+        ]
+      },
+      {
+        "page": 7,
+        "method": "paddle_ocr",
+        "status": "complete",
+        "ocr_confidence": 0.978,
+        "needs_review": false,
+        "warnings": [
+          "Page had only 4 native chars (below threshold 50)."
+        ]
+      },
+      {
+        "page": 8,
+        "method": "hybrid",
+        "status": "complete",
+        "ocr_confidence": 0.943,
+        "needs_review": false,
+        "warnings": [
+          "Mixed content detected: native text present (70 chars, 1 numbers), but embedded image region (100.0% page area) contains missing table/scanned content."
+        ]
+      },
+      {
+        "page": 9,
+        "method": "paddle_ocr",
+        "status": "complete",
+        "ocr_confidence": 0.9621,
+        "needs_review": false,
+        "warnings": [
+          "Page had only 6 native chars (below threshold 50)."
+        ]
+      }
+    ]
+  },
+  "statements": {
+    "balance_sheet": {
+      "statement_type": "BALANCE_SHEET",
+      "name": "BẢNG CÂN ĐỐI KẾ TOÁN",
+      "pages": [
+        3,
+        4,
+        5
+      ],
+      "columns": {
+        "current": "31/03/2026",
+        "previous": "01/01/2026"
+      },
+      "evidence_images": [],
+      "items": [
+        {
+          "code": "100",
+          "key": "CURRENT_ASSETS",
+          "label": "Tài sản ngắn hạn",
+          "raw_label": "Tài sn ngăn hn",
+          "current": 29403116984122,
+          "previous": 27307853326281,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "110",
+          "key": "CASH_AND_EQUIVALENTS",
+          "label": "Tiền và các khoản tương đương tiền",
+          "raw_label": "Tin và các khon tưong đưng tin",
+          "current": 1362241151028,
+          "previous": 1047628845195,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "120",
+          "key": "SHORT_TERM_INVESTMENTS",
+          "label": "Đầu tư tài chính ngắn hạn",
+          "raw_label": "Các khon đu tưr tài chính ngn hn",
+          "current": 17709033917800,
+          "previous": 16766348712331,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "123",
+          "key": "HELD_TO_MATURITY_INVESTMENTS",
+          "label": "Đầu tư nắm giữ đến ngày đáo hạn",
+          "raw_label": "Đu tư nm gi đn ngày đáo hn",
+          "current": 17709033917800,
+          "previous": 16766348712331,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "130",
+          "key": "SHORT_TERM_RECEIVABLES",
+          "label": "Các khoản phải thu ngắn hạn",
+          "raw_label": "Các khon phi thu ngn hn",
+          "current": 4737004862410,
+          "previous": 4706504965885,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "131",
+          "key": "TRADE_RECEIVABLES",
+          "label": "Phải thu ngắn hạn của khách hàng",
+          "raw_label": "Phi thu khách hàng",
+          "current": 4251607924981,
+          "previous": 4267572568769,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "140",
+          "key": "INVENTORIES",
+          "label": "Hàng tồn kho",
+          "raw_label": "Hàng tn kho",
+          "current": 5393002084291,
+          "previous": 4672324223311,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "160",
+          "key": "OTHER_CURRENT_ASSETS",
+          "label": "Tài sản ngắn hạn khác",
+          "raw_label": "Tài sn ngn hn khác",
+          "current": 201834968593,
+          "previous": 115046579559,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "200",
+          "key": "NON_CURRENT_ASSETS",
+          "label": "Tài sản dài hạn",
+          "raw_label": "Tài sn dài hn",
+          "current": 18372709942261,
+          "previous": 18644643646355,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "210",
+          "key": "LONG_TERM_RECEIVABLES",
+          "label": "Các khoản phải thu dài hạn",
+          "raw_label": "Các khon phi thu dài hn",
+          "current": 13690047395,
+          "previous": 12614647395,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "220",
+          "key": "FIXED_ASSETS",
+          "label": "Tài sản cố định",
+          "raw_label": "Tài sn c đnh",
+          "current": 5370258885051,
+          "previous": 5524253258343,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "260",
+          "key": "LONG_TERM_INVESTMENTS",
+          "label": "Đầu tư tài chính dài hạn",
+          "raw_label": "Các khon đu tư tài chính dài hn",
+          "current": 11964714562655,
+          "previous": 12165512370874,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "280",
+          "key": "TOTAL_ASSETS",
+          "label": "Tổng cộng tài sản",
+          "raw_label": "TÔNG TÀI SÅN",
+          "current": 47775826926383,
+          "previous": 45952496972636,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "300",
+          "key": "TOTAL_LIABILITIES",
+          "label": "Nợ phải trả",
+          "raw_label": "NGUN VÓN N PHI TRÅ",
+          "current": 16666572149360,
+          "previous": 16687564684416,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "310",
+          "key": "CURRENT_LIABILITIES",
+          "label": "Nợ ngắn hạn",
+          "raw_label": "N ngăn hn",
+          "current": 16666374440432,
+          "previous": 16687366975488,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "311",
+          "key": "TRADE_PAYABLES",
+          "label": "Phải trả người bán ngắn hạn",
+          "raw_label": "Phi trå ngưi bán",
+          "current": 3530141654886,
+          "previous": 3328041648476,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "321",
+          "key": "SHORT_TERM_BORROWINGS",
+          "label": "Vay và nợ thuê tài chính ngắn hạn",
+          "raw_label": "Vay ngn hn",
+          "current": 9894201200000,
+          "previous": 8841000000000,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "330",
+          "key": "NON_CURRENT_LIABILITIES",
+          "label": "Nợ dài hạn",
+          "raw_label": "N dài hn",
+          "current": 197708928,
+          "previous": 197708928,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "400",
+          "key": "EQUITY",
+          "label": "Vốn chủ sở hữu",
+          "raw_label": "VN CH S HU",
+          "current": 31109254777023,
+          "previous": 29264932288220,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "411",
+          "key": "OWNERS_CAPITAL",
+          "label": "Vốn góp của chủ sở hữu",
+          "raw_label": "Vn c phn",
+          "current": 20899554450000,
+          "previous": 20899554450000,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "420",
+          "key": "RETAINED_EARNINGS",
+          "label": "Lợi nhuận sau thuế chưa phân phối",
+          "raw_label": "Li nhun sau thu chưa phân phi",
+          "current": 10186474592727,
+          "previous": 8342152103924,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "440",
+          "key": "TOTAL_EQUITY_AND_LIABILITIES",
+          "label": "Tổng cộng nguồn vốn",
+          "raw_label": "TNG NGUN VÓN",
+          "current": 47775826926383,
+          "previous": 45952496972636,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        }
+      ],
+      "unmapped_items": [
+        {
+          "code": "111",
+          "key": null,
+          "label": "Tiền",
+          "raw_label": "Tièn",
+          "current": 1362241151028,
+          "previous": 1047628845195,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "132",
+          "key": null,
+          "label": "Trả trước cho người bán ngắn hạn",
+          "raw_label": "Trå trưc cho ngưi bán",
+          "current": 242299125553,
+          "previous": 225826743287,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "135",
+          "key": null,
+          "label": "Phải thu về cho vay ngắn hạn",
+          "raw_label": "Phi thu ngn hn khác",
+          "current": 247370377912,
+          "previous": 216217297008,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "136",
+          "key": null,
+          "label": "Dự phòng phải thu dài hạn khó đòi",
+          "raw_label": "D phng phåi thu khó đòi",
+          "current": -4272566036,
+          "previous": -3111643179,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "141",
+          "key": null,
+          "label": "Hàng tồn kho",
+          "raw_label": "Hàng tn kho",
+          "current": 5398879992458,
+          "previous": 4678166495499,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "142",
+          "key": null,
+          "label": "Dự phòng giảm giá hàng tồn kho",
+          "raw_label": "D phng gim giá hàng tn kho",
+          "current": -5877908167,
+          "previous": -5842272188,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "161",
+          "key": null,
+          "label": "Chi phí phải trả ngắn hạn",
+          "raw_label": "Chi phí ch phân b ngn hn",
+          "current": 144469200737,
+          "previous": 78707482571,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "162",
+          "key": null,
+          "label": "Thuế giá trị gia tăng được khấu trừ",
+          "raw_label": "Thu giá tr gia tăng đưc khu tr",
+          "current": 57365767856,
+          "previous": 36339096988,
+          "unit": "VND",
+          "source_page": 3,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "215",
+          "key": null,
+          "label": "Phải thu dài hạn khác",
+          "raw_label": "Phi thu dài hn khác",
+          "current": 13690047395,
+          "previous": 12614647395,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "221",
+          "key": null,
+          "label": "Tài sản cố định hữu hình",
+          "raw_label": "Tài sn c đnh hu hình",
+          "current": 5261884083569,
+          "previous": 5409269533527,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "222",
+          "key": null,
+          "label": "Nguyên giá",
+          "raw_label": "Nguyên giá",
+          "current": 20318131803346,
+          "previous": 20218660492456,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "223",
+          "key": null,
+          "label": "Giá trị hao mòn lũy kế",
+          "raw_label": "Giá tr hao mòn lüy k",
+          "current": -15056247719777,
+          "previous": -14809390958929,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "227",
+          "key": null,
+          "label": "Tài sản cố định vô hình",
+          "raw_label": "Tài sn c đnh vô hình",
+          "current": 108374801482,
+          "previous": 114983724816,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "228",
+          "key": null,
+          "label": "Nguyên giá",
+          "raw_label": "Nguyên giá",
+          "current": 287712931437,
+          "previous": 286936906437,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "229",
+          "key": null,
+          "label": "Giá trị hao mòn lũy kế",
+          "raw_label": "Giá tr hao mòn lüy ké",
+          "current": -179338129955,
+          "previous": -171953181621,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "240",
+          "key": null,
+          "label": "Bất động sản đầu tư",
+          "raw_label": "Bt đng sn đu tư",
+          "current": 51291485835,
+          "previous": 51663396459,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "241",
+          "key": null,
+          "label": "Nguyên giá",
+          "raw_label": "Nguyên giá",
+          "current": 94843066430,
+          "previous": 94843066430,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "242",
+          "key": null,
+          "label": "Giá trị hao mòn lũy kế",
+          "raw_label": "Giá tr hao mn lũy k",
+          "current": -43551580595,
+          "previous": -43179669971,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "250",
+          "key": null,
+          "label": "Tài sản dở dang dài hạn",
+          "raw_label": "Tài sn d dang dài hn",
+          "current": 232285542542,
+          "previous": 173998356005,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "252",
+          "key": null,
+          "label": "Chi phí xây dựng cơ bản dở dang",
+          "raw_label": "Xây dng cơ bn d dang",
+          "current": 232285542542,
+          "previous": 173998356005,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "261",
+          "key": null,
+          "label": "Đầu tư vào công ty con",
+          "raw_label": "Đu tư vào các công ty con",
+          "current": 11644853328956,
+          "previous": 11644853328956,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "262",
+          "key": null,
+          "label": "Đầu tư vào công ty liên doanh, liên kết",
+          "raw_label": "Đu tưr vào các công ty liên doanh, liên kt",
+          "current": 494168028669,
+          "previous": 494168028669,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "263",
+          "key": null,
+          "label": "Đầu tư góp vốn vào đơn vị khác",
+          "raw_label": "Đu tư góp vn vào các đơn v khác",
+          "current": 18300000000,
+          "previous": 18300000000,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "264",
+          "key": null,
+          "label": "D phòng tn tht đu tư vào đon v khác dài hn",
+          "raw_label": "D phòng tn tht đu tư vào đon v khác dài hn",
+          "current": -293189808669,
+          "previous": -293189808669,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "265",
+          "key": null,
+          "label": "Đầu tư nắm giữ đến ngày đáo hạn",
+          "raw_label": "Đu tư nm gi đn ngày đáo hn",
+          "current": 100583013699,
+          "previous": 301380821918,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "270",
+          "key": null,
+          "label": "Tài sản dài hạn khác",
+          "raw_label": "Tài sn dài hn khác",
+          "current": 740469418783,
+          "previous": 716601617279,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "271",
+          "key": null,
+          "label": "Chi phí phải trả dài hạn",
+          "raw_label": "Chi phí ch phân b dài hn",
+          "current": 678220129986,
+          "previous": 605923010181,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "272",
+          "key": null,
+          "label": "Tài sản thuế thu nhập hoãn lại",
+          "raw_label": "Tài sn thu thu nhp hoãn li",
+          "current": 62249288797,
+          "previous": 110678607098,
+          "unit": "VND",
+          "source_page": 4,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "312",
+          "key": null,
+          "label": "Người mua trả tiền trước ngắn hạn",
+          "raw_label": "Ngưi mua trà tin trưc",
+          "current": 181314259028,
+          "previous": 176267988069,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "313",
+          "key": null,
+          "label": "Phi tr c tc",
+          "raw_label": "Phi tr c tc",
+          "current": 8103716670,
+          "previous": 8159554210,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "314",
+          "key": null,
+          "label": "Thu phi np Nhà nưc",
+          "raw_label": "Thu phi np Nhà nưc",
+          "current": 625464915275,
+          "previous": 1706113387910,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "315",
+          "key": null,
+          "label": "Chi phí phải trả ngắn hạn",
+          "raw_label": "Phi tr ngưi lao đng",
+          "current": 167644579669,
+          "previous": 252457135790,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "316",
+          "key": null,
+          "label": "Chi phí phải trả dài hạn",
+          "raw_label": "Chi phí phi tr",
+          "current": 1605105777590,
+          "previous": 1517821493969,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "319",
+          "key": null,
+          "label": "Doanh thu ch phân b ngn hn",
+          "raw_label": "Doanh thu ch phân b ngn hn",
+          "current": 147229090,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "320",
+          "key": null,
+          "label": "Phải trả ngắn hạn khác",
+          "raw_label": "Phi tr ngn hn khác",
+          "current": 18704841295,
+          "previous": 20462843450,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "322",
+          "key": null,
+          "label": "Dự phòng phải trả ngắn hạn",
+          "raw_label": "D phng phi trå ngn hn",
+          "current": 5956651985,
+          "previous": 8859137170,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "323",
+          "key": null,
+          "label": "Quỹ khen thưởng, phúc lợi",
+          "raw_label": "Qu khen thưng và phúc li",
+          "current": 629589614944,
+          "previous": 828183786444,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "338",
+          "key": null,
+          "label": "Phải trả dài hạn khác",
+          "raw_label": "Phi tr dài hn khác",
+          "current": 197708928,
+          "previous": 197708928,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "412",
+          "key": null,
+          "label": "Thặng dư vốn cổ phần",
+          "raw_label": "Thng đư vn c phn",
+          "current": 23225734296,
+          "previous": 23225734296,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "420a",
+          "key": null,
+          "label": "LNST chưa phân phối lũy kế đến cuối kỳ trước",
+          "raw_label": "- LNST chua phân phi lūy ké đn cui k truc",
+          "current": 8342152103924,
+          "previous": 5143626044358,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "420b",
+          "key": null,
+          "label": "LNST chưa phân phối kỳ này",
+          "raw_label": "- LNST chua phân phi k này",
+          "current": 1844322488803,
+          "previous": 3198526059566,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": null,
+          "key": null,
+          "label": "K ton trưng\tGim đc Điu hành Tài chinh\tTng Gim dc TNK.H",
+          "raw_label": "K ton trưng\tGim đc Điu hành Tài chinh\tTng Gim dc TNK.H",
+          "current": 4,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "300",
+          "key": "TOTAL_LIABILITIES",
+          "label": "Nợ phải trả",
+          "raw_label": "NGUN VÓN N PHI TRÅ",
+          "current": 16666572149360,
+          "previous": 16687564684416,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "310",
+          "key": "CURRENT_LIABILITIES",
+          "label": "Nợ ngắn hạn",
+          "raw_label": "N ngăn hn",
+          "current": 16666374440432,
+          "previous": 16687366975488,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "311",
+          "key": "TRADE_PAYABLES",
+          "label": "Phải trả người bán ngắn hạn",
+          "raw_label": "Phi trå ngưi bán",
+          "current": 3530141654886,
+          "previous": 3328041648476,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "312",
+          "key": null,
+          "label": "Người mua trả tiền trước ngắn hạn",
+          "raw_label": "Ngưi mua trà tin trưc",
+          "current": 181314259028,
+          "previous": 176267988069,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "313",
+          "key": null,
+          "label": "Phi tr c tc",
+          "raw_label": "Phi tr c tc",
+          "current": 8103716670,
+          "previous": 8159554210,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "314",
+          "key": null,
+          "label": "Thu phi np Nhà nưc",
+          "raw_label": "Thu phi np Nhà nưc",
+          "current": 625464915275,
+          "previous": 1706113387910,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "315",
+          "key": null,
+          "label": "Chi phí phải trả ngắn hạn",
+          "raw_label": "Phi tr ngưi lao đng",
+          "current": 167644579669,
+          "previous": 252457135790,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "316",
+          "key": null,
+          "label": "Chi phí phải trả dài hạn",
+          "raw_label": "Chi phí phi tr",
+          "current": 1605105777590,
+          "previous": 1517821493969,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "319",
+          "key": null,
+          "label": "Doanh thu ch phân b ngn hn",
+          "raw_label": "Doanh thu ch phân b ngn hn",
+          "current": 147229090,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "320",
+          "key": null,
+          "label": "Phải trả ngắn hạn khác",
+          "raw_label": "Phi tr ngn hn khác",
+          "current": 18704841295,
+          "previous": 20462843450,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "321",
+          "key": "SHORT_TERM_BORROWINGS",
+          "label": "Vay và nợ thuê tài chính ngắn hạn",
+          "raw_label": "Vay ngn hn",
+          "current": 9894201200000,
+          "previous": 8841000000000,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "322",
+          "key": null,
+          "label": "Dự phòng phải trả ngắn hạn",
+          "raw_label": "D phng phi trå ngn hn",
+          "current": 5956651985,
+          "previous": 8859137170,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "323",
+          "key": null,
+          "label": "Quỹ khen thưởng, phúc lợi",
+          "raw_label": "Qu khen thưng và phúc li",
+          "current": 629589614944,
+          "previous": 828183786444,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "330",
+          "key": "NON_CURRENT_LIABILITIES",
+          "label": "Nợ dài hạn",
+          "raw_label": "N dài hn",
+          "current": 197708928,
+          "previous": 197708928,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "338",
+          "key": null,
+          "label": "Phải trả dài hạn khác",
+          "raw_label": "Phi tr dài hn khác",
+          "current": 197708928,
+          "previous": 197708928,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "400",
+          "key": "EQUITY",
+          "label": "Vốn chủ sở hữu",
+          "raw_label": "VN CH S HU",
+          "current": 31109254777023,
+          "previous": 29264932288220,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "411",
+          "key": "OWNERS_CAPITAL",
+          "label": "Vốn góp của chủ sở hữu",
+          "raw_label": "Vn c phn",
+          "current": 20899554450000,
+          "previous": 20899554450000,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "412",
+          "key": null,
+          "label": "Thặng dư vốn cổ phần",
+          "raw_label": "Thng đư vn c phn",
+          "current": 23225734296,
+          "previous": 23225734296,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "420",
+          "key": "RETAINED_EARNINGS",
+          "label": "Lợi nhuận sau thuế chưa phân phối",
+          "raw_label": "Li nhun sau thu chưa phân phi",
+          "current": 10186474592727,
+          "previous": 8342152103924,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "420a",
+          "key": null,
+          "label": "LNST chưa phân phối lũy kế đến cuối kỳ trước",
+          "raw_label": "- LNST chua phân phi lūy ké đn cui k truc",
+          "current": 8342152103924,
+          "previous": 5143626044358,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "420b",
+          "key": null,
+          "label": "LNST chưa phân phối kỳ này",
+          "raw_label": "- LNST chua phân phi k này",
+          "current": 1844322488803,
+          "previous": 3198526059566,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "440",
+          "key": "TOTAL_EQUITY_AND_LIABILITIES",
+          "label": "Tổng cộng nguồn vốn",
+          "raw_label": "TNG NGUN VÓN",
+          "current": 47775826926383,
+          "previous": 45952496972636,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": null,
+          "key": null,
+          "label": "K ton trưng\tGim đc Điu hành Tài chinh\tTng Gim dc TNK.H",
+          "raw_label": "K ton trưng\tGim đc Điu hành Tài chinh\tTng Gim dc TNK.H",
+          "current": 4,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 5,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        }
+      ]
+    },
+    "income_statement": {
+      "statement_type": "INCOME_STATEMENT",
+      "name": "BÁO CÁO KẾT QUẢ HOẠT ĐỘNG KINH DOANH",
+      "pages": [
+        6
+      ],
+      "columns": {
+        "current": "31/03/2026",
+        "previous": "31/03/2025"
+      },
+      "evidence_images": [],
+      "items": [
+        {
+          "code": "01",
+          "key": "GROSS_REVENUE",
+          "label": "Doanh thu bán hàng và cung cấp dịch vụ",
+          "raw_label": "S\tminh\tVND\tVND Doanh thu bán hàng và cung cp dch v",
+          "current": 13240394611726,
+          "previous": 10452150976679,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "02",
+          "key": "REVENUE_DEDUCTIONS",
+          "label": "Các khoản giảm trừ doanh thu",
+          "raw_label": "Các khon gim tr doanh thu",
+          "current": 22754975739,
+          "previous": 27517489084,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "10",
+          "key": "NET_REVENUE",
+          "label": "Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+          "raw_label": "Doanh thu thun v bán hàng và cung",
+          "current": 13217639635987,
+          "previous": 10424633487595,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "11",
+          "key": "COST_OF_GOODS_SOLD",
+          "label": "Giá vốn hàng bán",
+          "raw_label": "cáp dch v  Giá vn hàng bán và dch v cung cp",
+          "current": 7278764406353,
+          "previous": 5826559710740,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "20",
+          "key": "GROSS_PROFIT",
+          "label": "Lợi nhuận gộp về bán hàng và cung cấp dịch vụ",
+          "raw_label": "Li nhun gp v bán hàng và cung cp",
+          "current": 5938875229634,
+          "previous": 4598073776855,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "22",
+          "key": "FINANCIAL_INCOME",
+          "label": "Doanh thu hoạt động tài chính",
+          "raw_label": "dich v  Doanh thu hot đng tài chính",
+          "current": 337478602888,
+          "previous": 326657201229,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "23",
+          "key": "FINANCIAL_EXPENSES",
+          "label": "Chi phí tài chính",
+          "raw_label": "Chi phí tài chính",
+          "current": 146162086517,
+          "previous": 27118517012,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "24",
+          "key": "INTEREST_EXPENSES",
+          "label": "Chi phí đi vay",
+          "raw_label": "Trong đó: Chi phí đi vay",
+          "current": 111074539323,
+          "previous": 64888202743,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "25",
+          "key": "SELLING_EXPENSES",
+          "label": "Chi phí bán hàng",
+          "raw_label": "Chi phí bán hàng",
+          "current": 3345048888086,
+          "previous": 2898088541090,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "26",
+          "key": "ADMINISTRATIVE_EXPENSES",
+          "label": "Chi phí quản lý doanh nghiệp",
+          "raw_label": "Chi phí qun lý doanh nghip",
+          "current": 286573437030,
+          "previous": 256676439899,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "30",
+          "key": "OPERATING_PROFIT",
+          "label": "Lợi nhuận thuần từ hoạt động kinh doanh",
+          "raw_label": "Lơi nhun thuân tù hot đng kinh",
+          "current": 2498569420889,
+          "previous": 1742847480083,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "31",
+          "key": "OTHER_INCOME",
+          "label": "Thu nhập khác",
+          "raw_label": "doanh  Thu nhp khác",
+          "current": 38938023025,
+          "previous": 18959756243,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "32",
+          "key": "OTHER_EXPENSES",
+          "label": "Chi phí khác",
+          "raw_label": "Chi phí khác",
+          "current": 13620296829,
+          "previous": 5090926182,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "40",
+          "key": "NET_OTHER_PROFIT",
+          "label": "Lợi nhuận khác",
+          "raw_label": "Kt qu t hot đng khác",
+          "current": 25317726196,
+          "previous": 13868830061,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "50",
+          "key": "PROFIT_BEFORE_TAX",
+          "label": "Tổng lợi nhuận kế toán trước thuế",
+          "raw_label": "Li nhun k toán trưc thu",
+          "current": 2523887147085,
+          "previous": 1756716310144,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "51",
+          "key": "INCOME_TAX_EXPENSE",
+          "label": "Chi phí thuế thu nhập doanh nghiệp hiện hành",
+          "raw_label": "Chi phí thu TNDN hin hành",
+          "current": 426210619002,
+          "previous": 295278285473,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "52",
+          "key": "DEFERRED_TAX_EXPENSE",
+          "label": "Chi phí thuế thu nhập doanh nghiệp hoãn lại",
+          "raw_label": "Chi phí thu TNDN hoãn li",
+          "current": 48429318301,
+          "previous": 41483181024,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "60",
+          "key": "NET_PROFIT",
+          "label": "Lợi nhuận sau thuế thu nhập doanh nghiệp",
+          "raw_label": "Li nhun sau thu TNDN",
+          "current": 2049247209782,
+          "previous": 1419954843647,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        }
+      ],
+      "unmapped_items": [
+        {
+          "code": null,
+          "key": null,
+          "label": "Ngưi lp:",
+          "raw_label": "Ngưi lp:",
+          "current": 0,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "01",
+          "key": "GROSS_REVENUE",
+          "label": "Doanh thu bán hàng và cung cấp dịch vụ",
+          "raw_label": "S\tminh\tVND\tVND Doanh thu bán hàng và cung cp dch v",
+          "current": 13240394611726,
+          "previous": 10452150976679,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "02",
+          "key": "REVENUE_DEDUCTIONS",
+          "label": "Các khoản giảm trừ doanh thu",
+          "raw_label": "Các khon gim tr doanh thu",
+          "current": 22754975739,
+          "previous": 27517489084,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "10",
+          "key": "NET_REVENUE",
+          "label": "Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+          "raw_label": "Doanh thu thun v bán hàng và cung",
+          "current": 13217639635987,
+          "previous": 10424633487595,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "11",
+          "key": "COST_OF_GOODS_SOLD",
+          "label": "Giá vốn hàng bán",
+          "raw_label": "cáp dch v  Giá vn hàng bán và dch v cung cp",
+          "current": 7278764406353,
+          "previous": 5826559710740,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "20",
+          "key": "GROSS_PROFIT",
+          "label": "Lợi nhuận gộp về bán hàng và cung cấp dịch vụ",
+          "raw_label": "Li nhun gp v bán hàng và cung cp",
+          "current": 5938875229634,
+          "previous": 4598073776855,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "22",
+          "key": "FINANCIAL_INCOME",
+          "label": "Doanh thu hoạt động tài chính",
+          "raw_label": "dich v  Doanh thu hot đng tài chính",
+          "current": 337478602888,
+          "previous": 326657201229,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "23",
+          "key": "FINANCIAL_EXPENSES",
+          "label": "Chi phí tài chính",
+          "raw_label": "Chi phí tài chính",
+          "current": 146162086517,
+          "previous": 27118517012,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "24",
+          "key": "INTEREST_EXPENSES",
+          "label": "Chi phí đi vay",
+          "raw_label": "Trong đó: Chi phí đi vay",
+          "current": 111074539323,
+          "previous": 64888202743,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "25",
+          "key": "SELLING_EXPENSES",
+          "label": "Chi phí bán hàng",
+          "raw_label": "Chi phí bán hàng",
+          "current": 3345048888086,
+          "previous": 2898088541090,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "26",
+          "key": "ADMINISTRATIVE_EXPENSES",
+          "label": "Chi phí quản lý doanh nghiệp",
+          "raw_label": "Chi phí qun lý doanh nghip",
+          "current": 286573437030,
+          "previous": 256676439899,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "30",
+          "key": "OPERATING_PROFIT",
+          "label": "Lợi nhuận thuần từ hoạt động kinh doanh",
+          "raw_label": "Lơi nhun thuân tù hot đng kinh",
+          "current": 2498569420889,
+          "previous": 1742847480083,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "31",
+          "key": "OTHER_INCOME",
+          "label": "Thu nhập khác",
+          "raw_label": "doanh  Thu nhp khác",
+          "current": 38938023025,
+          "previous": 18959756243,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "32",
+          "key": "OTHER_EXPENSES",
+          "label": "Chi phí khác",
+          "raw_label": "Chi phí khác",
+          "current": 13620296829,
+          "previous": 5090926182,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "40",
+          "key": "NET_OTHER_PROFIT",
+          "label": "Lợi nhuận khác",
+          "raw_label": "Kt qu t hot đng khác",
+          "current": 25317726196,
+          "previous": 13868830061,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "50",
+          "key": "PROFIT_BEFORE_TAX",
+          "label": "Tổng lợi nhuận kế toán trước thuế",
+          "raw_label": "Li nhun k toán trưc thu",
+          "current": 2523887147085,
+          "previous": 1756716310144,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "51",
+          "key": "INCOME_TAX_EXPENSE",
+          "label": "Chi phí thuế thu nhập doanh nghiệp hiện hành",
+          "raw_label": "Chi phí thu TNDN hin hành",
+          "current": 426210619002,
+          "previous": 295278285473,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "52",
+          "key": "DEFERRED_TAX_EXPENSE",
+          "label": "Chi phí thuế thu nhập doanh nghiệp hoãn lại",
+          "raw_label": "Chi phí thu TNDN hoãn li",
+          "current": 48429318301,
+          "previous": 41483181024,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "60",
+          "key": "NET_PROFIT",
+          "label": "Lợi nhuận sau thuế thu nhập doanh nghiệp",
+          "raw_label": "Li nhun sau thu TNDN",
+          "current": 2049247209782,
+          "previous": 1419954843647,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": null,
+          "key": null,
+          "label": "Ngưi lp:",
+          "raw_label": "Ngưi lp:",
+          "current": 0,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 6,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "01",
+          "key": "GROSS_REVENUE",
+          "label": "Doanh thu bán hàng và cung cấp dịch vụ",
+          "raw_label": "LUU CHUYN TIN TÙ HOT ĐNG KINH DOANH Li nhun k toán trưc thu",
+          "current": 2523887147085,
+          "previous": 1756716310144,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "02",
+          "key": "REVENUE_DEDUCTIONS",
+          "label": "Các khoản giảm trừ doanh thu",
+          "raw_label": "Điu chnh cho các khon: Kháu hao và phân b",
+          "current": 286471255407,
+          "previous": 266520891976,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "03",
+          "key": null,
+          "label": "Các khon d phng",
+          "raw_label": "Các khon d phng",
+          "current": 1681378232,
+          "previous": -595687526,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "04",
+          "key": null,
+          "label": "L chênh lch t giá do đánh giá li các khon mc tin t có gc ngoi t",
+          "raw_label": "L chênh lch t giá do đánh giá li các khon mc tin t có gc ngoi t",
+          "current": 12484177990,
+          "previous": 1628216367,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "05",
+          "key": null,
+          "label": "Thu nhp t c tc, lãi tin gi và lãi/l t hot đng đu tư khác",
+          "raw_label": "Thu nhp t c tc, lãi tin gi và lãi/l t hot đng đu tư khác",
+          "current": -308218937652,
+          "previous": -363274955558,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "06",
+          "key": null,
+          "label": "Chi phí lãi vay",
+          "raw_label": "Chi phí đi vay",
+          "current": 111074539323,
+          "previous": 64888202743,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "08",
+          "key": null,
+          "label": "Lợi nhuận thuần từ hoạt động kinh doanh",
+          "raw_label": "Li nhun t hot đng kinh doanh",
+          "current": 2627379560385,
+          "previous": 1725882978146,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "09",
+          "key": null,
+          "label": "trưc nhng thay đi vn lưu đng Bin đng các khon phi thu",
+          "raw_label": "trưc nhng thay đi vn lưu đng Bin đng các khon phi thu",
+          "current": -41764084476,
+          "previous": 819666247635,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "10",
+          "key": "NET_REVENUE",
+          "label": "Doanh thu thuần về bán hàng và cung cấp dịch vụ",
+          "raw_label": "Bin đng hàng tn kho",
+          "current": -720571042079,
+          "previous": -971005686692,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "11",
+          "key": "COST_OF_GOODS_SOLD",
+          "label": "Giá vốn hàng bán",
+          "raw_label": "Bin đng các khon phi trå và n phi trå khác",
+          "current": 154333804859,
+          "previous": -417205389845,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "12",
+          "key": null,
+          "label": "Bin đng chi phí ch phân b",
+          "raw_label": "Bin đng chi phí ch phân b",
+          "current": -137038136912,
+          "previous": -62989310106,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "14",
+          "key": null,
+          "label": "Chi phí lãi vay",
+          "raw_label": "Chi phí đi vay đā trà",
+          "current": -73095390849,
+          "previous": -48566079453,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "15",
+          "key": null,
+          "label": "Chi phí thuế thu nhập doanh nghiệp hoãn lại",
+          "raw_label": "Thu thu nhp doanh nghip đã np",
+          "current": -1489219113513,
+          "previous": -830239907204,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "17",
+          "key": null,
+          "label": "Tin chi khác cho hot đng kinh doanh",
+          "raw_label": "Tin chi khác cho hot đng kinh doanh",
+          "current": -406421377664,
+          "previous": -385057858787,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "20",
+          "key": "GROSS_PROFIT",
+          "label": "Lợi nhuận gộp về bán hàng và cung cấp dịch vụ",
+          "raw_label": "Lưu chuyn tin thun t hot đng",
+          "current": -86395780249,
+          "previous": -169515006306,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "21",
+          "key": null,
+          "label": "Tin chi mua tài sn c đnh và tài sn dài hn khác",
+          "raw_label": "Tin chi mua tài sn c đnh và tài sn dài hn khác",
+          "current": -193787280468,
+          "previous": -194245993522,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "22",
+          "key": "FINANCIAL_INCOME",
+          "label": "Doanh thu hoạt động tài chính",
+          "raw_label": "Tin thu t thanh lý tài săn c đnh và xây dng co bn d dang",
+          "current": 1738494606,
+          "previous": 2994837930,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "23",
+          "key": "FINANCIAL_EXPENSES",
+          "label": "Chi phí tài chính",
+          "raw_label": "Tin chi tin gi có k hn",
+          "current": -540000000000,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "24",
+          "key": "INTEREST_EXPENSES",
+          "label": "Chi phí đi vay",
+          "raw_label": "Tin thu t tin gi có k hn",
+          "current": 700000000000,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "25",
+          "key": "SELLING_EXPENSES",
+          "label": "Chi phí bán hàng",
+          "raw_label": "Tin chi đu tư góp vn vào công ty con",
+          "current": -179900000000,
+          "previous": null,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "27",
+          "key": null,
+          "label": "Tin thu lãi tin gi và c tc",
+          "raw_label": "Tin thu lãi tin gi và c tc",
+          "current": 94829315068,
+          "previous": 98033092607,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "UNMAPPED",
+          "confidence": 0,
+          "needs_review": true,
+          "warnings": [
+            "No canonical financial key matched"
+          ]
+        },
+        {
+          "code": "30",
+          "key": "OPERATING_PROFIT",
+          "label": "Lợi nhuận thuần từ hoạt động kinh doanh",
+          "raw_label": "du tư Lưu chuyn tin thun t hot đng",
+          "current": -637219470794,
+          "previous": 426881937015,
+          "unit": "VND",
+          "source_page": 7,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        }
+      ]
+    },
+    "cash_flow_statement": {
+      "statement_type": "CASH_FLOW",
+      "name": "BÁO CÁO LƯU CHUYỂN TIỀN TỆ",
+      "pages": [
+        8
+      ],
+      "columns": {
+        "current": "31/03/2026",
+        "previous": "31/03/2025"
+      },
+      "evidence_images": [],
+      "items": [
+        {
+          "code": "33",
+          "key": "PROCEEDS_FROM_BORROWINGS",
+          "label": "Tiền thu từ đi vay",
+          "raw_label": "LƯU CHUYN TIN TÙ HOT ĐNG TÀI CHÍNH Tin thu t đi vay",
+          "current": 5579981600000,
+          "previous": 4690000000000,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "34",
+          "key": "REPAYMENT_OF_BORROWINGS",
+          "label": "Tiền trả nợ gốc vay",
+          "raw_label": "Tin chi tr n gc vay",
+          "current": -4541000000000,
+          "previous": -3750000000000,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "36",
+          "key": "DIVIDENDS_PAID",
+          "label": "Cổ tức, lợi nhuận đã trả cho chủ sở hữu",
+          "raw_label": "Tin chi tr c tc",
+          "current": -55837540,
+          "previous": -1044977722500,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "40",
+          "key": "NET_CASH_FROM_FINANCING",
+          "label": "Lưu chuyển tiền thuần từ hoạt động tài chính",
+          "raw_label": "Luu chuyn thun t hot đng",
+          "current": 1038925762460,
+          "previous": -104977722500,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "50",
+          "key": "NET_CHANGE_IN_CASH",
+          "label": "Lưu chuyển tiền thuần trong kỳ",
+          "raw_label": "tài chính Luu chuyn tin thun trong k",
+          "current": 315310511417,
+          "previous": 152389208209,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "60",
+          "key": "BEGINNING_CASH",
+          "label": "Tiền và tương đương tiền đầu kỳ",
+          "raw_label": "Tin và các khon tưong đưong tin",
+          "current": 1047628845195,
+          "previous": 1408567701321,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "61",
+          "key": "FX_EFFECT_ON_CASH",
+          "label": "Ảnh hưởng của thay đổi tỷ giá hối đoái quy đổi ngoại tệ",
+          "raw_label": "Ånh hưng ca thay đi t giá hi đoi đi vi tin và các khon tưrong",
+          "current": -698205584,
+          "previous": -68418925,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "70",
+          "key": "ENDING_CASH",
+          "label": "Tiền và tương đương tiền cuối kỳ",
+          "raw_label": "đưong tin Tin và các khon tưong đưong tin",
+          "current": 1362241151028,
+          "previous": 1560888490605,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        }
+      ],
+      "unmapped_items": [
+        {
+          "code": "33",
+          "key": "PROCEEDS_FROM_BORROWINGS",
+          "label": "Tiền thu từ đi vay",
+          "raw_label": "LƯU CHUYN TIN TÙ HOT ĐNG TÀI CHÍNH Tin thu t đi vay",
+          "current": 5579981600000,
+          "previous": 4690000000000,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "34",
+          "key": "REPAYMENT_OF_BORROWINGS",
+          "label": "Tiền trả nợ gốc vay",
+          "raw_label": "Tin chi tr n gc vay",
+          "current": -4541000000000,
+          "previous": -3750000000000,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "36",
+          "key": "DIVIDENDS_PAID",
+          "label": "Cổ tức, lợi nhuận đã trả cho chủ sở hữu",
+          "raw_label": "Tin chi tr c tc",
+          "current": -55837540,
+          "previous": -1044977722500,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "40",
+          "key": "NET_CASH_FROM_FINANCING",
+          "label": "Lưu chuyển tiền thuần từ hoạt động tài chính",
+          "raw_label": "Luu chuyn thun t hot đng",
+          "current": 1038925762460,
+          "previous": -104977722500,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "50",
+          "key": "NET_CHANGE_IN_CASH",
+          "label": "Lưu chuyển tiền thuần trong kỳ",
+          "raw_label": "tài chính Luu chuyn tin thun trong k",
+          "current": 315310511417,
+          "previous": 152389208209,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "60",
+          "key": "BEGINNING_CASH",
+          "label": "Tiền và tương đương tiền đầu kỳ",
+          "raw_label": "Tin và các khon tưong đưong tin",
+          "current": 1047628845195,
+          "previous": 1408567701321,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "61",
+          "key": "FX_EFFECT_ON_CASH",
+          "label": "Ảnh hưởng của thay đổi tỷ giá hối đoái quy đổi ngoại tệ",
+          "raw_label": "Ånh hưng ca thay đi t giá hi đoi đi vi tin và các khon tưrong",
+          "current": -698205584,
+          "previous": -68418925,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        },
+        {
+          "code": "70",
+          "key": "ENDING_CASH",
+          "label": "Tiền và tương đương tiền cuối kỳ",
+          "raw_label": "đưong tin Tin và các khon tưong đưong tin",
+          "current": 1362241151028,
+          "previous": 1560888490605,
+          "unit": "VND",
+          "source_page": 8,
+          "evidence_image_url": null,
+          "mapping_status": "MATCHED",
+          "confidence": 0.98,
+          "needs_review": false,
+          "warnings": []
+        }
+      ]
+    }
+  },
+  "validation": {
+    "previous": {
+      "is_valid": true,
+      "total_checks": 8,
+      "passed_checks": 7,
+      "warning_checks": 1,
+      "failed_checks": 0,
+      "not_checkable_checks": 0,
+      "checks": [
+        {
+          "check_id": "BS_EQ_01",
+          "name": "Cân đối Tổng Tài sản và Tổng Nguồn vốn",
+          "description": "Tổng Tài sản (280) == Tổng Nguồn vốn (440)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Tổng Tài sản": 45952496972636,
+            "Tổng Nguồn vốn": 45952496972636,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "BS_EQ_02",
+          "name": "Phân rã Tài sản ngắn hạn và dài hạn",
+          "description": "Tổng Tài sản (280) == Tài sản ngắn hạn (100) + Tài sản dài hạn (200)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Tổng Tài sản": 45952496972636,
+            "TSNH + TSDH": 45952496972636,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "BS_EQ_03",
+          "name": "Phân rã Nguồn vốn",
+          "description": "Tổng Nguồn vốn (440) == Nợ phải trả (300) + Vốn chủ sở hữu (400)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Tổng Nguồn vốn": 45952496972636,
+            "Nợ phải trả + VCSH": 45952496972636,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "BS_EQ_04",
+          "name": "Phân rã Nợ phải trả",
+          "description": "Nợ phải trả (300) == Nợ ngắn hạn (310) + Nợ dài hạn (330)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Nợ phải trả": 16687564684416,
+            "Nợ ngắn hạn + Nợ dài hạn": 16687564684416,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "IS_EQ_01",
+          "name": "Tính cân đối Doanh thu thuần",
+          "description": "Doanh thu thuần (10) == Doanh thu bán hàng (01) - Giảm trừ (02)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Doanh thu thuần": 10424633487595,
+            "Doanh thu gộp - Giảm trừ": 10424633487595,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "IS_EQ_02",
+          "name": "Tính cân đối Lợi nhuận gộp",
+          "description": "Lợi nhuận gộp (20) == Doanh thu thuần (10) - Giá vốn (11)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Lợi nhuận gộp": 4598073776855,
+            "Doanh thu thuần - Giá vốn": 4598073776855,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "IS_EQ_03",
+          "name": "Tổng lợi nhuận trước thuế",
+          "description": "Lợi nhuận trước thuế (50) == LN thuần HĐKD (30) + Lợi nhuận khác (40)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "LN trước thuế": 1756716310144,
+            "LN thuần HĐKD + LN khác": 1756716310144,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "MAP_HEALTH_01",
+          "name": "Chất lượng Mapping Semantic",
+          "description": "Kiểm tra các khoản mục chưa ánh xạ hoặc cần rà soát thủ công.",
+          "status": "warning",
+          "difference": null,
+          "tolerance": null,
+          "details": {
+            "needs_review": 0,
+            "unmapped": 107
+          },
+          "message": "Có 0 khoản mục cần rà soát và 107 khoản mục chưa ánh xạ."
+        }
+      ],
+      "summary": "Tổng số 8 kiểm tra | 7 Đạt (PASS) | 0 Lỗi (FAIL) | 1 Cảnh báo (WARNING) | 0 Chưa đủ số liệu (NOT CHECKABLE)"
+    },
+    "current": {
+      "is_valid": true,
+      "total_checks": 8,
+      "passed_checks": 7,
+      "warning_checks": 1,
+      "failed_checks": 0,
+      "not_checkable_checks": 0,
+      "checks": [
+        {
+          "check_id": "BS_EQ_01",
+          "name": "Cân đối Tổng Tài sản và Tổng Nguồn vốn",
+          "description": "Tổng Tài sản (280) == Tổng Nguồn vốn (440)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Tổng Tài sản": 47775826926383,
+            "Tổng Nguồn vốn": 47775826926383,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "BS_EQ_02",
+          "name": "Phân rã Tài sản ngắn hạn và dài hạn",
+          "description": "Tổng Tài sản (280) == Tài sản ngắn hạn (100) + Tài sản dài hạn (200)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Tổng Tài sản": 47775826926383,
+            "TSNH + TSDH": 47775826926383,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "BS_EQ_03",
+          "name": "Phân rã Nguồn vốn",
+          "description": "Tổng Nguồn vốn (440) == Nợ phải trả (300) + Vốn chủ sở hữu (400)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Tổng Nguồn vốn": 47775826926383,
+            "Nợ phải trả + VCSH": 47775826926383,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "BS_EQ_04",
+          "name": "Phân rã Nợ phải trả",
+          "description": "Nợ phải trả (300) == Nợ ngắn hạn (310) + Nợ dài hạn (330)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Nợ phải trả": 16666572149360,
+            "Nợ ngắn hạn + Nợ dài hạn": 16666572149360,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "IS_EQ_01",
+          "name": "Tính cân đối Doanh thu thuần",
+          "description": "Doanh thu thuần (10) == Doanh thu bán hàng (01) - Giảm trừ (02)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Doanh thu thuần": 13217639635987,
+            "Doanh thu gộp - Giảm trừ": 13217639635987,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "IS_EQ_02",
+          "name": "Tính cân đối Lợi nhuận gộp",
+          "description": "Lợi nhuận gộp (20) == Doanh thu thuần (10) - Giá vốn (11)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "Lợi nhuận gộp": 5938875229634,
+            "Doanh thu thuần - Giá vốn": 5938875229634,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "IS_EQ_03",
+          "name": "Tổng lợi nhuận trước thuế",
+          "description": "Lợi nhuận trước thuế (50) == LN thuần HĐKD (30) + Lợi nhuận khác (40)",
+          "status": "pass",
+          "difference": 0,
+          "tolerance": 1000,
+          "details": {
+            "LN trước thuế": 2523887147085,
+            "LN thuần HĐKD + LN khác": 2523887147085,
+            "diff": 0
+          },
+          "message": "Đạt cân đối hoàn hảo."
+        },
+        {
+          "check_id": "MAP_HEALTH_01",
+          "name": "Chất lượng Mapping Semantic",
+          "description": "Kiểm tra các khoản mục chưa ánh xạ hoặc cần rà soát thủ công.",
+          "status": "warning",
+          "difference": null,
+          "tolerance": null,
+          "details": {
+            "needs_review": 0,
+            "unmapped": 107
+          },
+          "message": "Có 0 khoản mục cần rà soát và 107 khoản mục chưa ánh xạ."
+        }
+      ],
+      "summary": "Tổng số 8 kiểm tra | 7 Đạt (PASS) | 0 Lỗi (FAIL) | 1 Cảnh báo (WARNING) | 0 Chưa đủ số liệu (NOT CHECKABLE)"
+    }
+  },
+  "review": {
+    "total_items": 163,
+    "items_needing_review": 70
+  },
+  "evidence_images": [],
+  "warnings": [
+    "Chưa cấu hình kho lưu trữ cloud (STORAGE_BACKEND) nên không lưu ảnh bằng chứng."
+  ]
+}

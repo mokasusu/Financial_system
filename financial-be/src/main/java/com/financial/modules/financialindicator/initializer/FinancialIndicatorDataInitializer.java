@@ -449,7 +449,7 @@ public class FinancialIndicatorDataInitializer implements ApplicationRunner {
             seedMapping(indicators.get("NET_PROFIT"), standard, FinancialStatementType.INCOME_STATEMENT, "60", "NET_PROFIT", "Lợi nhuận sau thuế thu nhập doanh nghiệp");
         }
 
-        // TT99 Standard
+        // TT99 Standard (Circular 99/2025/TT-BTC)
         AccountingStandard tt99 = AccountingStandard.TT99;
         seedMapping(indicators.get("CURRENT_ASSETS"), tt99, FinancialStatementType.BALANCE_SHEET, "100", "CURRENT_ASSETS", "Tài sản ngắn hạn");
         seedMapping(indicators.get("CASH_AND_EQUIVALENTS"), tt99, FinancialStatementType.BALANCE_SHEET, "110", "CASH_AND_EQUIVALENTS", "Tiền và các khoản tương đương tiền");
@@ -458,6 +458,8 @@ public class FinancialIndicatorDataInitializer implements ApplicationRunner {
         seedMapping(indicators.get("TOTAL_LIABILITIES"), tt99, FinancialStatementType.BALANCE_SHEET, "300", "TOTAL_LIABILITIES", "Nợ phải trả");
         seedMapping(indicators.get("CURRENT_LIABILITIES"), tt99, FinancialStatementType.BALANCE_SHEET, "310", "CURRENT_LIABILITIES", "Nợ ngắn hạn");
         seedMapping(indicators.get("EQUITY"), tt99, FinancialStatementType.BALANCE_SHEET, "400", "EQUITY", "Vốn chủ sở hữu");
+        seedMapping(indicators.get("RECEIVABLES_ENDING"), tt99, FinancialStatementType.BALANCE_SHEET, "130", "SHORT_TERM_RECEIVABLES", "Phải thu ngắn hạn");
+        seedMapping(indicators.get("PAYABLES_ENDING"), tt99, FinancialStatementType.BALANCE_SHEET, "311", "SHORT_TERM_PAYABLES", "Phải trả người bán ngắn hạn");
         seedMapping(indicators.get("NET_REVENUE"), tt99, FinancialStatementType.INCOME_STATEMENT, "10", "NET_REVENUE", "Doanh thu thuần");
         seedMapping(indicators.get("COST_OF_GOODS_SOLD"), tt99, FinancialStatementType.INCOME_STATEMENT, "11", "COST_OF_GOODS_SOLD", "Giá vốn hàng bán");
         seedMapping(indicators.get("GROSS_PROFIT"), tt99, FinancialStatementType.INCOME_STATEMENT, "20", "GROSS_PROFIT", "Lợi nhuận gộp");

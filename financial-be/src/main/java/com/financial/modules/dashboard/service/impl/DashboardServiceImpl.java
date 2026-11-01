@@ -7,6 +7,7 @@ import com.financial.modules.aianalysis.entity.*;
 import com.financial.modules.aianalysis.repository.AIAnalysisRepository;
 import com.financial.modules.assessment.entity.Assessment;
 import com.financial.modules.assessment.entity.AssessmentDetail;
+import com.financial.modules.assessment.enums.HealthClassification;
 import com.financial.modules.assessment.repository.AssessmentRepository;
 import com.financial.modules.calculationengine.entity.FinancialCalculation;
 import com.financial.modules.calculationengine.entity.FinancialCalculationResult;
@@ -192,8 +193,15 @@ public class DashboardServiceImpl implements DashboardService {
                 .aiStatus(aiAnalysis != null ? "READY" : "AI_ANALYSIS_NOT_AVAILABLE")
                 .build();
 
+        BigDecimal overallScore = assessment != null ? assessment.getOverallScore() : null;
+        HealthClassification healthClassification = assessment != null ? assessment.getHealthClassification() : null;
+        String healthClassificationDisplayName = healthClassification != null ? healthClassification.getDisplayName() : null;
+
         return DashboardOverviewResponse.builder()
                 .context(context)
+                .overallScore(overallScore)
+                .healthClassification(healthClassification)
+                .healthClassificationDisplayName(healthClassificationDisplayName)
                 .dataStatuses(dataStatuses)
                 .coreKpis(coreKpis)
                 .financialRatios(categories)
