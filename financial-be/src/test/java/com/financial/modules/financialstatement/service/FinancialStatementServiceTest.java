@@ -2,6 +2,9 @@ package com.financial.modules.financialstatement.service;
 
 import com.financial.common.config.OcrProperties;
 import com.financial.common.exception.*;
+import com.financial.modules.aianalysis.repository.AIAnalysisRepository;
+import com.financial.modules.assessment.repository.AssessmentRepository;
+import com.financial.modules.calculationengine.repository.FinancialCalculationRepository;
 import com.financial.modules.company.entity.Company;
 import com.financial.modules.company.repository.CompanyRepository;
 import com.financial.modules.financialstatement.dto.*;
@@ -16,8 +19,10 @@ import com.financial.modules.financialstatement.repository.FinancialStatementIte
 import com.financial.modules.financialstatement.repository.FinancialStatementItemRepository;
 import com.financial.modules.financialstatement.repository.FinancialStatementRepository;
 import com.financial.modules.financialstatement.service.impl.FinancialStatementServiceImpl;
+import com.financial.modules.riskanalysis.repository.RiskAnalysisRepository;
 import com.financial.modules.user.entity.User;
 import com.financial.modules.user.repository.UserRepository;
+import com.financial.modules.validation.repository.ValidationExecutionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,6 +64,21 @@ class FinancialStatementServiceTest {
     @Mock
     private OcrIntegrationService ocrIntegrationService;
 
+    @Mock
+    private AIAnalysisRepository aiAnalysisRepository;
+
+    @Mock
+    private AssessmentRepository assessmentRepository;
+
+    @Mock
+    private RiskAnalysisRepository riskAnalysisRepository;
+
+    @Mock
+    private FinancialCalculationRepository calculationRepository;
+
+    @Mock
+    private ValidationExecutionRepository validationExecutionRepository;
+
     @Spy
     private FinancialStatementMapper statementMapper = new FinancialStatementMapper();
 
@@ -84,7 +104,12 @@ class FinancialStatementServiceTest {
                 userRepository,
                 ocrIntegrationService,
                 statementMapper,
-                ocrProperties
+                ocrProperties,
+                aiAnalysisRepository,
+                assessmentRepository,
+                riskAnalysisRepository,
+                calculationRepository,
+                validationExecutionRepository
         );
 
         sampleUser = User.builder().id(1L).fullName("Test User").email("test@example.com").build();

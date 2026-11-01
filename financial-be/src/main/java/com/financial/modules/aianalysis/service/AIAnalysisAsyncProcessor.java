@@ -123,9 +123,11 @@ public class AIAnalysisAsyncProcessor {
                 analysis.getId(), errorReason);
 
         String companyName = payload.getCompany() != null ? payload.getCompany().getCompanyName() : "Doanh nghiệp";
-        String period = payload.getStatement() != null ? payload.getStatement().getPeriod() : "Kỳ báo cáo";
+        String period = payload.getCompany() != null && payload.getCompany().getPeriod() != null
+                ? payload.getCompany().getPeriod()
+                : "Kỳ báo cáo";
         Double score = payload.getAssessment() != null && payload.getAssessment().getOverallScore() != null
-                ? payload.getAssessment().getOverallScore()
+                ? payload.getAssessment().getOverallScore().doubleValue()
                 : 80.0;
         String rating = payload.getAssessment() != null && payload.getAssessment().getHealthClassification() != null
                 ? payload.getAssessment().getHealthClassification()
