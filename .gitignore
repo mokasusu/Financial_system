@@ -1,0 +1,131 @@
+# ==============================================================================
+# FINANCIAL SYSTEM - ROOT .GITIGNORE
+# Monorepo: Spring Boot (Java) Backend + Next.js (TypeScript) Frontend
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Operating System Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ------------------------------------------------------------------------------
+# 2. IDE & Editor Files
+# ------------------------------------------------------------------------------
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ------------------------------------------------------------------------------
+# 3. AI Agents, Logs & Temporary Files
+# ------------------------------------------------------------------------------
+.agent/
+.agents/
+.gemini/
+.antigravity/
+*.log
+logs/
+**/logs/
+*.tmp
+*.bak
+
+# ------------------------------------------------------------------------------
+# 4. Backend: Spring Boot & Maven (financial-be)
+# ------------------------------------------------------------------------------
+financial-be/target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# User-uploaded Financial Statements (PDFs, Images, OCR Crop Scans)
+financial-be/uploads/
+**/uploads/
+**/storage/
+
+# ------------------------------------------------------------------------------
+# 5. Frontend: Next.js & Node.js (financial-fe)
+# ------------------------------------------------------------------------------
+financial-fe/node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Next.js build output & cache
+financial-fe/.next/
+**/.next/
+financial-fe/out/
+**/out/
+financial-fe/build/
+**/build/
+
+# TypeScript cache
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output
+
+# Vercel deployment cache
+.vercel
+
+# ------------------------------------------------------------------------------
+# 6. Environment Variables, Secrets & Credentials (NEVER COMMIT)
+# ------------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+
+# Explicitly track example environment files
+!.env.example
+!**/.env.example
+
