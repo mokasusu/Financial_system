@@ -1,0 +1,37 @@
+# Build artifacts
+target/
+*.class
+*.jar
+*.war
+
+# Environment files and credentials (never bake secrets into Docker images)
+.env
+.env.*
+!.env.example
+
+# Git repository
+.git/
+.gitignore
+.gitattributes
+
+# IDE and editors
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+
+# Logs and runtime upload directories
+logs/
+*.log
+uploads/
+tmp/
+temp/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
