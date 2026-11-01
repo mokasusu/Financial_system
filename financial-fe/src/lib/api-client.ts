@@ -9,8 +9,28 @@ import type { AuthResponse } from "@/features/auth/types";
 
 export const getBaseURL = (): string => {
   const url = process.env.NEXT_PUBLIC_API_URL?.trim() || "";
-  if (!url) return "";
-  return url.replace(/\/+$/, "").replace(/\/api$/, "");
+  const cleaned = url ? url.replace(/\/+$/, "").replace(/\/api$/, "") : "";
+
+  // Safety fallback: Khi chạy trên browser tại domain triển khai (như Vercel),
+  // tuyệt đối không gọi tới localhost/loopback (tránh lỗi PNA & CORS)
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    const isLocalhost =
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "::1";
+
+    if (!isLocalhost && (!cleaned || cleaned.includes("localhost") || cleaned.includes("127.0.0.1"))) {
+      return "https://financial-system-jc3a.onrender.com";
+    }
+  }
+
+  return (
+    cleaned ||
+    (process.env.NODE_ENV === "production"
+      ? "https://financial-system-jc3a.onrender.com"
+      : "http://localhost:8080")
+  );
 };
 
 const baseURL = getBaseURL();

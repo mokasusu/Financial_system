@@ -9,6 +9,7 @@ import {
   pipelineService,
 } from "@/features/statements/services";
 import { dashboardService } from "@/features/dashboard/services";
+import { getBaseURL } from "@/lib/api-client";
 import { PipelineStepper } from "@/features/statements/components/pipeline-stepper";
 import type { StatementItem, StatementStatus } from "@/features/statements/types";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -70,7 +71,7 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
   });
 
   const token = useAuthStore((state) => state.accessToken);
-  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL?.trim() || "").replace(/\/+$/, "").replace(/\/api$/, "");
+  const apiBaseUrl = getBaseURL();
 
   const filePreviewUrl = statement?.fileUrl
     ? (statement.fileUrl.startsWith("http")
