@@ -174,7 +174,8 @@ export default function LoginPage() {
           className="w-full h-10 border-slate-200 text-slate-700 hover:bg-slate-50 font-normal"
           onClick={() => {
             // OAuth2 endpoint supported by financial-be
-            window.location.href = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/oauth2/authorization/google`;
+            const apiBase = (process.env.NEXT_PUBLIC_API_URL?.trim() || "").replace(/\/+$/, "").replace(/\/api$/, "");
+            window.location.href = `${apiBase || "http://localhost:8080"}/oauth2/authorization/google`;
           }}
         >
           <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">

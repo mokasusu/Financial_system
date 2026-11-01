@@ -7,7 +7,13 @@ import { useAuthStore } from "@/stores/auth-store";
 import type { ApiResponse, ApiError } from "@/types/api";
 import type { AuthResponse } from "@/features/auth/types";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL?.trim() || "";
+export const getBaseURL = (): string => {
+  const url = process.env.NEXT_PUBLIC_API_URL?.trim() || "";
+  if (!url) return "";
+  return url.replace(/\/+$/, "").replace(/\/api$/, "");
+};
+
+const baseURL = getBaseURL();
 
 export const apiClient = axios.create({
   baseURL,
@@ -98,7 +104,7 @@ apiClient.interceptors.response.use(
 
       try {
         const refreshResponse = await axios.post<ApiResponse<AuthResponse>>(
-          `${baseURL}/api/auth/refresh`,
+          `${baseURL ? baseURL : ""}/api/auth/refresh`,
           { refreshToken },
           { headers: { "Content-Type": "application/json" } }
         );
@@ -140,10 +146,12 @@ function normalizeError(error: AxiosError<ApiResponse>): ApiError {
   if (!responseData?.message) {
     if (error.response?.status === 500) {
       message = "Máy chủ phản hồi lỗi (500). Vui lòng kiểm tra lại dịch vụ backend hoặc thử lại sau giây lát.";
+    } else if (error.response?.status === 403) {
+      message = "Truy cập bị từ chối (403 Forbidden). Vui lòng kiểm tra quyền truy cập hoặc cấu hình CORS của máy chủ backend.";
     } else if (error.response?.status === 404) {
       message = "Không tìm thấy tài nguyên yêu cầu (404).";
     } else if (error.code === "ERR_NETWORK" || !error.response) {
-      message = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.";
+      message = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng hoặc cấu hình CORS backend.";
     }
   }
 

@@ -70,10 +70,12 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
   });
 
   const token = useAuthStore((state) => state.accessToken);
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.trim() || "";
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL?.trim() || "").replace(/\/+$/, "").replace(/\/api$/, "");
 
   const filePreviewUrl = statement?.fileUrl
-    ? `${apiBaseUrl}${statement.fileUrl}${token ? `?token=${encodeURIComponent(token)}` : ""}`
+    ? (statement.fileUrl.startsWith("http")
+        ? `${statement.fileUrl}${token ? `?token=${encodeURIComponent(token)}` : ""}`
+        : `${apiBaseUrl}${statement.fileUrl.startsWith("/") ? "" : "/"}${statement.fileUrl}${token ? `?token=${encodeURIComponent(token)}` : ""}`)
     : statementId
     ? `${apiBaseUrl}/api/financial-statements/${statementId}/file${token ? `?token=${encodeURIComponent(token)}` : ""}`
     : null;
