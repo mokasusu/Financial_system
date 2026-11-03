@@ -60,6 +60,10 @@ export default function DashboardPage() {
       ),
     enabled: Boolean(currentCompany?.id),
     staleTime: 60 * 1000,
+    refetchInterval: (query) => {
+      const aiStatus = query.state.data?.aiCommentary?.aiGenerationStatus;
+      return aiStatus === "PROCESSING" || aiStatus === "PENDING" ? 3000 : false;
+    },
     retry: 1,
   });
 

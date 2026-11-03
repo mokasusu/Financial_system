@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   RotateCcw,
+  Clock,
 } from "lucide-react";
 
 interface AiExecutiveCommentaryProps {
@@ -86,7 +87,21 @@ export function AiExecutiveCommentary({
         (err as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ||
         (err as { message?: string })?.message ||
         "Tạo lại nhận định AI thất bại. Vui lòng kiểm tra BCTC đã xác nhận.";
-      setFeedbackMsg({ type: "error", text: msg });
+
+      if (
+        msg.includes("currently in progress") ||
+        msg.includes("đang tiến hành") ||
+        msg.includes("PROCESSING")
+      ) {
+        setFeedbackMsg({
+          type: "success",
+          text: "Hệ thống AI đang xử lý phân tích. Kết quả sẽ tự động hiển thị trong giây lát.",
+        });
+        await queryClient.invalidateQueries({ queryKey: ["dashboard-overview"] });
+        setTimeout(() => setFeedbackMsg(null), 5000);
+      } else {
+        setFeedbackMsg({ type: "error", text: msg });
+      }
     } finally {
       setIsRegenerating(false);
     }
@@ -136,7 +151,7 @@ export function AiExecutiveCommentary({
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-[#006c49]" />
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-[#006c49]">
-            NHẬN ĐỊNH CHUYÊN SÂU TỪ AI (OPENROUTER GATEWAY)
+            NHẬN ĐỊNH CHUYÊN SÂU TỪ AI
           </CardTitle>
           {commentary?.reviewStatus === "EDITED" && (
             <Badge variant="outline" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 font-semibold">
@@ -159,45 +174,73 @@ export function AiExecutiveCommentary({
           )}
 
           {/* Nút Tạo lại nhận xét AI */}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleRegenerate}
-            disabled={isRegenerating || !targetStatementId}
-            className="h-7 text-xs font-semibold text-[#006c49] border-emerald-300 hover:bg-emerald-50 gap-1.5"
-            title="Gửi yêu cầu AI phân tích lại toàn bộ các tỷ số và tạo bộ nhận xét mới"
-          >
-            <RotateCw className={`h-3 w-3 ${isRegenerating ? "animate-spin" : ""}`} />
-            {isRegenerating ? "Đang tạo lại..." : "Tạo lại nhận xét AI"}
-          </Button>
+          {(() => {
+            const isAiProcessing =
+              isRegenerating ||
+              commentary?.aiGenerationStatus === "PROCESSING" ||
+              commentary?.aiGenerationStatus === "PENDING";
 
-          {/* Nút Chỉnh sửa trực tiếp nhận xét */}
-          {!isEditing ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setIsEditing(true)}
-              className="h-7 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-slate-50 gap-1.5"
-            >
-              <Edit3 className="h-3 w-3 text-[#006c49]" />
-              Chỉnh sửa nhận xét
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setIsEditing(false)}
-              disabled={isSaving}
-              className="h-7 text-xs text-slate-600 gap-1"
-            >
-              <X className="h-3 w-3" />
-              Đóng chỉnh sửa
-            </Button>
-          )}
+            return (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleRegenerate}
+                  disabled={isAiProcessing || !targetStatementId}
+                  className="h-7 text-xs font-semibold text-[#006c49] border-emerald-300 hover:bg-emerald-50 gap-1.5"
+                  title="Gửi yêu cầu AI phân tích lại toàn bộ các tỷ số và tạo bộ nhận xét mới"
+                >
+                  <RotateCw className={`h-3 w-3 ${isAiProcessing ? "animate-spin" : ""}`} />
+                  {isAiProcessing ? "Đang tạo lại..." : "Tạo lại nhận xét AI"}
+                </Button>
 
-          <Badge variant={hasCommentary ? "safe" : "outline"} className="text-[10px] uppercase font-semibold">
-            {hasCommentary ? "AI Certified Model" : "CHƯA PHÂN TÍCH"}
-          </Badge>
+                {/* Nút Chỉnh sửa trực tiếp nhận xét */}
+                {!isEditing ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsEditing(true)}
+                    className="h-7 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-slate-50 gap-1.5"
+                  >
+                    <Edit3 className="h-3 w-3 text-[#006c49]" />
+                    Chỉnh sửa nhận xét
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsEditing(false)}
+                    disabled={isSaving}
+                    className="h-7 text-xs text-slate-600 gap-1"
+                  >
+                    <X className="h-3 w-3" />
+                    Đóng chỉnh sửa
+                  </Button>
+                )}
+
+                <Badge
+                  variant={
+                    hasCommentary
+                      ? "safe"
+                      : isAiProcessing
+                      ? "warning"
+                      : commentary?.aiGenerationStatus === "FAILED"
+                      ? "destructive"
+                      : "outline"
+                  }
+                  className="text-[10px] uppercase font-semibold"
+                >
+                  {hasCommentary
+                    ? "AI Certified Model"
+                    : isAiProcessing
+                    ? "ĐANG XỬ LÝ..."
+                    : commentary?.aiGenerationStatus === "FAILED"
+                    ? "LỖI PHÂN TÍCH"
+                    : "CHƯA PHÂN TÍCH"}
+                </Badge>
+              </>
+            );
+          })()}
         </div>
       </CardHeader>
 
@@ -271,7 +314,25 @@ export function AiExecutiveCommentary({
         ) : null}
 
         {/* Chế độ Hiển thị nhận định */}
-        {hasCommentary ? (
+        {commentary?.aiGenerationStatus === "PROCESSING" ||
+        commentary?.aiGenerationStatus === "PENDING" ||
+        isRegenerating ? (
+          <div className="py-8 text-center space-y-3 bg-emerald-50/50 rounded-xl border border-emerald-200">
+            <Loader2 className="h-8 w-8 text-[#006c49] mx-auto animate-spin" />
+            <div className="space-y-1">
+              <p className="font-bold text-slate-800 text-sm">
+                AI đang xử lý phân tích và tổng hợp nhận định điều hành...
+              </p>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                Hệ thống đang đối chiếu 14 chỉ số tài chính và các quy tắc thẩm định. Màn hình sẽ tự động cập nhật ngay khi hoàn tất.
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-medium">
+              <Clock className="h-3.5 w-3.5 animate-pulse" />
+              Đang phân tích nền (Tự động cập nhật)
+            </div>
+          </div>
+        ) : hasCommentary ? (
           <>
             {finalComment && (
               <div className="flex items-start gap-2 p-3 rounded-lg bg-emerald-50/80 border border-emerald-200/60 mb-2">
@@ -301,6 +362,26 @@ export function AiExecutiveCommentary({
               </div>
             )}
           </>
+        ) : commentary?.aiGenerationStatus === "FAILED" ? (
+          <div className="py-6 text-center text-slate-500 space-y-3 bg-amber-50/50 rounded-xl border border-amber-200">
+            <AlertTriangle className="h-7 w-7 text-amber-600 mx-auto" />
+            <div className="space-y-1">
+              <p className="font-semibold text-slate-800 text-xs">
+                Phiên phân tích AI trước đó chưa hoàn tất hoặc bị gián đoạn
+              </p>
+              <p className="text-[11px] text-slate-500 max-w-md mx-auto">
+                Bạn có thể bấm nút bên dưới để hệ thống khởi tạo lại quy trình phân tích và nhận định.
+              </p>
+            </div>
+            <Button
+              onClick={handleRegenerate}
+              disabled={isRegenerating || !targetStatementId}
+              className="bg-[#006c49] hover:bg-[#00563a] text-white text-xs font-semibold h-8 shadow-xs"
+            >
+              <RotateCw className="h-3.5 w-3.5 mr-1.5" />
+              Thử tạo lại nhận định AI
+            </Button>
+          </div>
         ) : (
           <div className="py-6 text-center text-slate-400 space-y-3">
             <Sparkles className="h-8 w-8 text-[#006c49]/60 mx-auto" />

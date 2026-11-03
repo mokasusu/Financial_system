@@ -49,5 +49,9 @@ public interface FinancialStatementService {
             Pageable pageable);
 
     void deleteFinancialStatement(Long userId, Long statementId);
+
+    FinancialStatementResponse finalizeStatement(Long userId, Long statementId);
+
+    void hardDeleteDraft(Long statementId);
 }
 

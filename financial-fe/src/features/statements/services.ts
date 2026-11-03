@@ -126,6 +126,16 @@ export const statementService = {
   deleteStatement: async (id: number): Promise<void> => {
     await apiClient.delete<ApiResponse<void>>(`/api/financial-statements/${id}`);
   },
+
+  finalizeStatement: async (id: number): Promise<FinancialStatement> => {
+    const response = await apiClient.post<ApiResponse<FinancialStatement>>(
+      `/api/financial-statements/${id}/finalize`
+    );
+    if (!response.data.data) {
+      throw new Error(response.data.message || "Lưu và phê duyệt BCTC thất bại");
+    }
+    return response.data.data;
+  },
 };
 
 // Analysis Pipeline Services for Steps 4, 5, 6, 7

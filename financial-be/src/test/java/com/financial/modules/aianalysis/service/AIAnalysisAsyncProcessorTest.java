@@ -167,7 +167,7 @@ class AIAnalysisAsyncProcessorTest {
     }
 
     @Test
-    @DisplayName("processAIAnalysisAsync marks FAILED on malformed JSON response")
+    @DisplayName("processAIAnalysisAsync triggers fallback and completes on malformed JSON response")
     void testProcessAIAnalysisAsync_MalformedJson() {
         when(aiAnalysisRepository.findById(1L)).thenReturn(Optional.of(analysis));
         when(systemPromptProvider.getSystemPrompt()).thenReturn("System Prompt");
@@ -176,13 +176,12 @@ class AIAnalysisAsyncProcessorTest {
 
         processor.processAIAnalysisAsync(1L, payload, null);
 
-        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.FAILED);
-        assertThat(analysis.getErrorCode()).isEqualTo("AI_RESPONSE_PARSING_FAILED");
-        assertThat(analysis.getErrorMessage()).isNotBlank();
+        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.COMPLETED);
+        assertThat(analysis.getExecutiveSummary()).isNotBlank();
     }
 
     @Test
-    @DisplayName("processAIAnalysisAsync marks FAILED on OpenRouterTimeoutException")
+    @DisplayName("processAIAnalysisAsync triggers fallback and completes on OpenRouterTimeoutException")
     void testProcessAIAnalysisAsync_Timeout() {
         when(aiAnalysisRepository.findById(1L)).thenReturn(Optional.of(analysis));
         when(systemPromptProvider.getSystemPrompt()).thenReturn("System Prompt");
@@ -192,12 +191,12 @@ class AIAnalysisAsyncProcessorTest {
 
         processor.processAIAnalysisAsync(1L, payload, null);
 
-        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.FAILED);
-        assertThat(analysis.getErrorCode()).isEqualTo("OPENROUTER_TIMEOUT");
+        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.COMPLETED);
+        assertThat(analysis.getExecutiveSummary()).isNotBlank();
     }
 
     @Test
-    @DisplayName("processAIAnalysisAsync marks FAILED on OpenRouterApiException")
+    @DisplayName("processAIAnalysisAsync triggers fallback and completes on OpenRouterApiException")
     void testProcessAIAnalysisAsync_ApiError() {
         when(aiAnalysisRepository.findById(1L)).thenReturn(Optional.of(analysis));
         when(systemPromptProvider.getSystemPrompt()).thenReturn("System Prompt");
@@ -207,12 +206,12 @@ class AIAnalysisAsyncProcessorTest {
 
         processor.processAIAnalysisAsync(1L, payload, null);
 
-        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.FAILED);
-        assertThat(analysis.getErrorCode()).isEqualTo("OPENROUTER_RATE_LIMIT");
+        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.COMPLETED);
+        assertThat(analysis.getExecutiveSummary()).isNotBlank();
     }
 
     @Test
-    @DisplayName("processAIAnalysisAsync marks FAILED on invalid enum values in AI output")
+    @DisplayName("processAIAnalysisAsync triggers fallback on invalid enum values in AI output")
     void testProcessAIAnalysisAsync_InvalidEnumValue() {
         String invalidEnumJson = """
                 {
@@ -239,13 +238,12 @@ class AIAnalysisAsyncProcessorTest {
 
         processor.processAIAnalysisAsync(1L, payload, null);
 
-        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.FAILED);
-        assertThat(analysis.getErrorCode()).isEqualTo("AI_VALIDATION_FAILED");
-        assertThat(analysis.getErrorMessage()).contains("Invalid risk severity");
+        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.COMPLETED);
+        assertThat(analysis.getExecutiveSummary()).isNotBlank();
     }
 
     @Test
-    @DisplayName("processAIAnalysisAsync marks FAILED when AI attempts to change authoritative risk severity")
+    @DisplayName("processAIAnalysisAsync triggers fallback when AI attempts to change authoritative risk severity")
     void testProcessAIAnalysisAsync_AuthoritativeSeverityChangeRejected() {
         String changeSeverityJson = """
                 {
@@ -273,13 +271,12 @@ class AIAnalysisAsyncProcessorTest {
 
         processor.processAIAnalysisAsync(1L, payload, null);
 
-        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.FAILED);
-        assertThat(analysis.getErrorCode()).isEqualTo("AI_VALIDATION_FAILED");
-        assertThat(analysis.getErrorMessage()).contains("Unsupported risk severity modification");
+        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.COMPLETED);
+        assertThat(analysis.getExecutiveSummary()).isNotBlank();
     }
 
     @Test
-    @DisplayName("processAIAnalysisAsync marks FAILED when AI references a non-existent risk")
+    @DisplayName("processAIAnalysisAsync triggers fallback when AI references a non-existent risk")
     void testProcessAIAnalysisAsync_NonExistentRiskRejected() {
         String nonExistentRiskJson = """
                 {
@@ -307,9 +304,8 @@ class AIAnalysisAsyncProcessorTest {
 
         processor.processAIAnalysisAsync(1L, payload, null);
 
-        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.FAILED);
-        assertThat(analysis.getErrorCode()).isEqualTo("AI_VALIDATION_FAILED");
-        assertThat(analysis.getErrorMessage()).contains("non-existent risk ID");
+        assertThat(analysis.getStatus()).isEqualTo(AIAnalysisStatus.COMPLETED);
+        assertThat(analysis.getExecutiveSummary()).isNotBlank();
     }
 }
 

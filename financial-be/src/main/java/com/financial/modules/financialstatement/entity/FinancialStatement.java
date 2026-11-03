@@ -93,6 +93,17 @@ public class FinancialStatement {
     @Column(name = "processing_completed_at")
     private LocalDateTime processingCompletedAt;
 
+    @Column(name = "is_draft", nullable = false)
+    @Builder.Default
+    private Boolean isDraft = true;
+
+    @Column(name = "deleted", nullable = false)
+    @Builder.Default
+    private Boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -90,6 +90,9 @@ public class FinancialStatementResponse {
     @Schema(description = "Record update timestamp")
     private LocalDateTime updatedAt;
 
+    @Schema(description = "Whether the statement is currently an unfinalized draft", example = "false")
+    private Boolean isDraft;
+
     @Schema(description = "List of standardized financial indicators")
     private List<FinancialStatementItemResponse> items;
 }

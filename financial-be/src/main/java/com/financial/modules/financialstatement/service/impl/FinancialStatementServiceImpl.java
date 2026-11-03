@@ -132,6 +132,8 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
                 .period(period != null && !period.isBlank() ? period : "current")
                 .processingStatus(FinancialStatementStatus.QUEUED)
                 .uploadedAt(LocalDateTime.now())
+                .isDraft(true)
+                .deleted(false)
                 .build();
 
         FinancialStatement savedStatement = statementRepository.save(statement);
@@ -434,7 +436,49 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
     public void deleteFinancialStatement(Long userId, Long statementId) {
         FinancialStatement statement = getOwnedStatement(userId, statementId);
 
-        log.info("Deleting financial statement session ID {} and associated downstream entities for user ID {}", statementId, userId);
+        if (Boolean.FALSE.equals(statement.getIsDraft())) {
+            // Official statement: SOFT DELETE to preserve audit and historical evaluation data
+            log.info("Soft-deleting official financial statement ID {} for user ID {}", statementId, userId);
+            statement.setDeleted(true);
+            statement.setDeletedAt(LocalDateTime.now());
+            statementRepository.save(statement);
+            log.info("Official financial statement ID {} marked as deleted successfully", statementId);
+        } else {
+            // Draft statement: HARD DELETE to completely clean up staging database records and physical file
+            log.info("Hard-deleting draft financial statement session ID {} for user ID {}", statementId, userId);
+            executeHardDelete(statement);
+            log.info("Draft financial statement session ID {} hard-deleted successfully", statementId);
+        }
+    }
+
+    @Override
+    @Transactional
+    public FinancialStatementResponse finalizeStatement(Long userId, Long statementId) {
+        FinancialStatement statement = getOwnedStatement(userId, statementId);
+
+        if (statement.getProcessingStatus() != FinancialStatementStatus.DATA_CONFIRMED) {
+            throw new UnconfirmedStatementException("Báo cáo tài chính chưa được xác nhận số liệu kế toán trước khi lưu.");
+        }
+
+        log.info("Finalizing financial statement ID {} for user ID {}. Transitioning isDraft from true to false.", statementId, userId);
+        statement.setIsDraft(false);
+        FinancialStatement saved = statementRepository.save(statement);
+        return statementMapper.toResponse(saved);
+    }
+
+    @Override
+    @Transactional
+    public void hardDeleteDraft(Long statementId) {
+        statementRepository.findById(statementId).ifPresent(statement -> {
+            if (Boolean.TRUE.equals(statement.getIsDraft())) {
+                log.info("Executing scheduled hard delete of abandoned draft statement ID {}", statementId);
+                executeHardDelete(statement);
+            }
+        });
+    }
+
+    private void executeHardDelete(FinancialStatement statement) {
+        Long statementId = statement.getId();
 
         // 1. Delete AI Analysis
         List<AIAnalysis> aiAnalyses = aiAnalysisRepository.findByFinancialStatementId(statementId);
@@ -481,7 +525,6 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
 
         // 7. Delete Statement (cascades to items and item drafts)
         statementRepository.delete(statement);
-        log.info("Financial statement session ID {} deleted successfully", statementId);
     }
 }
 

@@ -55,7 +55,7 @@ export function RiskHeatmapAndValidation({
       <Card className="lg:col-span-2 bg-white flex flex-col justify-between">
         <CardHeader className="pb-3 border-b border-slate-100">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-700">
-            MA TRẬN CẢNH BÁO RỦI RO 14 TỶ SỐ TÀI CHÍNH (COLOR-CODED RISK MATRIX)
+            MA TRẬN CẢNH BÁO RỦI RO 14 TỶ SỐ TÀI CHÍNH
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4 space-y-2 flex-1 flex flex-col justify-between">

@@ -41,7 +41,7 @@ export default function StatementsListPage() {
   const statements = data?.items || [];
 
   const handleDelete = async (id: number, fileName?: string) => {
-    if (!window.confirm(`Bạn có chắc chắn muốn xóa phiên báo cáo "${fileName || `#${id}`}" vĩnh viễn không? Toàn bộ số liệu bóc tách và phân tích liên quan sẽ bị xóa khỏi hệ thống.`)) {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa phiên báo cáo "${fileName || `#${id}`}" không? Thao tác này sẽ xóa mềm báo cáo và ẩn khỏi danh sách để lưu vết bảo mật.`)) {
       return;
     }
 
@@ -65,7 +65,15 @@ export default function StatementsListPage() {
     }
   };
 
-  const renderStatusBadge = (status?: string) => {
+  const renderStatusBadge = (status?: string, isDraft?: boolean) => {
+    if (isDraft) {
+      return (
+        <Badge variant="outline" className="text-amber-700 bg-amber-50 border-amber-300">
+          <Clock className="h-3 w-3 mr-1 text-amber-500" />
+          BẢN NHÁP
+        </Badge>
+      );
+    }
     switch (status) {
       case "DATA_CONFIRMED":
         return <Badge variant="safe">ĐÃ CHỐT SỐ LIỆU</Badge>;
@@ -171,7 +179,7 @@ export default function StatementsListPage() {
                       <span className="font-bold text-sm text-slate-900">
                         {stmt.originalFileName || `BCTC_${stmt.period}.pdf`}
                       </span>
-                      {renderStatusBadge(stmt.status)}
+                      {renderStatusBadge(stmt.status, stmt.isDraft)}
                     </div>
 
                     <div className="flex items-center gap-3 text-xs text-slate-500">

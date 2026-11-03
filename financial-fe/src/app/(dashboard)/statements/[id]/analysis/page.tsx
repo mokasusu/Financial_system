@@ -168,6 +168,10 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
     queryKey: ["analysis-overview", statementId],
     queryFn: () => dashboardService.getOverview(undefined, statementId),
     enabled: Boolean(statementId) && currentStep >= 4,
+    refetchInterval: (query) => {
+      const aiStatus = query.state.data?.aiCommentary?.aiGenerationStatus;
+      return aiStatus === "PROCESSING" || aiStatus === "PENDING" ? 3000 : false;
+    },
     retry: 1,
   });
 
@@ -357,7 +361,16 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
         (err as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ||
         (err as { message?: string })?.message ||
         "Tạo nhận định AI thất bại.";
-      setStepError(msg);
+      if (
+        msg.includes("currently in progress") ||
+        msg.includes("đang tiến hành") ||
+        msg.includes("PROCESSING")
+      ) {
+        // AI is already processing in background, refetch to trigger polling & spinner
+        await refetchOverview();
+      } else {
+        setStepError(msg);
+      }
     } finally {
       setIsRegeneratingAI(false);
     }
@@ -418,8 +431,22 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
   const handleApprove = async () => {
     try {
       setIsApproving(true);
+      setStepError(null);
+      // Chuyển trạng thái BCTC từ Draft -> Chính thức (isDraft = false)
+      await statementService.finalizeStatement(statementId);
+      await queryClient.invalidateQueries({ queryKey: ["financial-statements"] });
+      await queryClient.invalidateQueries({ queryKey: ["financial-statements-list"] });
+      await queryClient.invalidateQueries({ queryKey: ["dashboard-overview"] });
+      await queryClient.invalidateQueries({ queryKey: ["statement-meta", statementId] });
+      setActiveStatementId(statementId);
       // Route back to dashboard upon approval
       router.push("/dashboard");
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ||
+        (err as { message?: string })?.message ||
+        "Lưu và phê duyệt báo cáo tài chính thất bại.";
+      setStepError(msg);
     } finally {
       setIsApproving(false);
     }
@@ -438,6 +465,17 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
             <Badge variant="outline" className="text-[10px] font-semibold text-slate-600 bg-slate-50 border-slate-200">
               {statement?.accountingStandard || "Chuẩn mực Kế toán"}
             </Badge>
+            {statement?.isDraft ? (
+              <Badge variant="outline" className="text-[10px] font-bold bg-amber-50 text-amber-700 border-amber-300 gap-1">
+                <Clock className="h-3 w-3 text-amber-500" />
+                BẢN NHÁP (CHƯA LƯU)
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border-emerald-300 gap-1">
+                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                CHÍNH THỨC
+              </Badge>
+            )}
             <span className="text-[11px] text-slate-400">
               Kỳ: {currentPeriodText}
             </span>
@@ -453,10 +491,10 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
               setShowDeleteSessionModal(true);
             }}
             className="h-7 text-xs font-semibold text-rose-600 border-rose-200 bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 gap-1.5 shadow-2xs"
-            title="Xóa vĩnh viễn phiên báo cáo này và toàn bộ dữ liệu phân tích liên quan"
+            title={statement?.isDraft ? "Hủy bỏ bản nháp phân tích này" : "Xóa mềm phiên báo cáo này khỏi danh sách"}
           >
             <Trash2 className="h-3.5 w-3.5 text-rose-500" />
-            Xóa phiên báo cáo này
+            {statement?.isDraft ? "Hủy bản nháp này" : "Xóa phiên báo cáo này"}
           </Button>
         </div>
       </div>
@@ -1010,51 +1048,78 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-[#006c49]" />
                   <CardTitle className="text-xs font-bold uppercase tracking-wider text-[#006c49]">
-                    Nhận định AI (OpenRouter Gateway)
+                    Nhận định AI
                   </CardTitle>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
                   {/* Nút Tạo lại nhận xét AI */}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleRegenerateAI}
-                    disabled={isRegeneratingAI}
-                    className="h-7 text-xs font-semibold text-[#006c49] border-emerald-300 hover:bg-emerald-50 gap-1"
-                    title="Tạo lại nhận định AI từ đầu dựa trên 14 tỷ số đã tính toán"
-                  >
-                    <RotateCw className={`h-3 w-3 ${isRegeneratingAI ? "animate-spin" : ""}`} />
-                    {isRegeneratingAI ? "Đang tạo lại..." : "Tạo lại nhận xét AI"}
-                  </Button>
+                  {(() => {
+                    const isAiProcessing =
+                      isRegeneratingAI ||
+                      analysisOverview?.aiCommentary?.aiGenerationStatus === "PROCESSING" ||
+                      analysisOverview?.aiCommentary?.aiGenerationStatus === "PENDING";
 
-                  {/* Nút Chỉnh sửa trực tiếp */}
-                  {!isEditingComment ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setIsEditingComment(true)}
-                      className="h-7 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-slate-50 gap-1"
-                    >
-                      <Edit3 className="h-3 w-3 text-[#006c49]" />
-                      Chỉnh sửa
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setIsEditingComment(false)}
-                      disabled={isSavingComment}
-                      className="h-7 text-xs text-slate-600 gap-1"
-                    >
-                      <X className="h-3 w-3" />
-                      Đóng
-                    </Button>
-                  )}
+                    return (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleRegenerateAI}
+                          disabled={isAiProcessing}
+                          className="h-7 text-xs font-semibold text-[#006c49] border-emerald-300 hover:bg-emerald-50 gap-1"
+                          title="Tạo lại nhận định AI từ đầu dựa trên 14 tỷ số đã tính toán"
+                        >
+                          <RotateCw className={`h-3 w-3 ${isAiProcessing ? "animate-spin" : ""}`} />
+                          {isAiProcessing ? "Đang phân tích..." : "Tạo lại nhận xét AI"}
+                        </Button>
 
-                  <Badge variant={analysisOverview?.aiCommentary?.executiveSummary ? "safe" : "outline"}>
-                    {analysisOverview?.aiCommentary?.executiveSummary ? "COMPLETED" : "CHƯA KÍCH HOẠT"}
-                  </Badge>
+                        {/* Nút Chỉnh sửa trực tiếp */}
+                        {!isEditingComment ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setIsEditingComment(true)}
+                            className="h-7 text-xs font-semibold text-slate-700 border-slate-300 hover:bg-slate-50 gap-1"
+                          >
+                            <Edit3 className="h-3 w-3 text-[#006c49]" />
+                            Chỉnh sửa
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setIsEditingComment(false)}
+                            disabled={isSavingComment}
+                            className="h-7 text-xs text-slate-600 gap-1"
+                          >
+                            <X className="h-3 w-3" />
+                            Đóng
+                          </Button>
+                        )}
+
+                        <Badge
+                          variant={
+                            analysisOverview?.aiCommentary?.executiveSummary
+                              ? "safe"
+                              : isAiProcessing
+                              ? "warning"
+                              : analysisOverview?.aiCommentary?.aiGenerationStatus === "FAILED"
+                              ? "destructive"
+                              : "outline"
+                          }
+                        >
+                          {analysisOverview?.aiCommentary?.executiveSummary
+                            ? "COMPLETED"
+                            : isAiProcessing
+                            ? "ĐANG XỬ LÝ..."
+                            : analysisOverview?.aiCommentary?.aiGenerationStatus === "FAILED"
+                            ? "LỖI PHÂN TÍCH"
+                            : "CHƯA KÍCH HOẠT"}
+                        </Badge>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -1143,7 +1208,25 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
                   </div>
                 ) : null}
 
-                {analysisOverview?.aiCommentary?.executiveSummary ? (
+                {analysisOverview?.aiCommentary?.aiGenerationStatus === "PROCESSING" ||
+                analysisOverview?.aiCommentary?.aiGenerationStatus === "PENDING" ||
+                isRegeneratingAI ? (
+                  <div className="py-8 text-center space-y-3 bg-emerald-50/50 rounded-xl border border-emerald-200">
+                    <Loader2 className="h-8 w-8 text-[#006c49] mx-auto animate-spin" />
+                    <div className="space-y-1">
+                      <p className="font-bold text-slate-800 text-sm">
+                        AI đang phân tích và tổng hợp nhận định tài chính...
+                      </p>
+                      <p className="text-xs text-slate-500 max-w-md mx-auto">
+                        Hệ thống đang đối chiếu 14 chỉ số tài chính, ma trận rủi ro và tiêu chuẩn kiểm định. Quá trình xử lý nền đang diễn ra và màn hình sẽ tự động cập nhật ngay khi hoàn tất.
+                      </p>
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-medium">
+                      <Clock className="h-3.5 w-3.5 animate-pulse" />
+                      Tự động làm mới khi có kết quả
+                    </div>
+                  </div>
+                ) : analysisOverview?.aiCommentary?.executiveSummary ? (
                   <>
                     <p>
                       <strong>• Tóm tắt điều hành:</strong>{" "}
@@ -1176,6 +1259,25 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
                       </div>
                     )}
                   </>
+                ) : analysisOverview?.aiCommentary?.aiGenerationStatus === "FAILED" ? (
+                  <div className="py-6 text-center text-slate-500 space-y-3 bg-amber-50/50 rounded-xl border border-amber-200">
+                    <AlertTriangle className="h-7 w-7 text-amber-600 mx-auto" />
+                    <p className="font-semibold text-slate-800 text-xs">
+                      Phiên phân tích AI trước đó chưa hoàn tất hoặc bị gián đoạn
+                    </p>
+                    <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                      Bạn có thể bấm nút bên dưới để hệ thống khởi tạo lại quy trình phân tích và nhận định.
+                    </p>
+                    <Button
+                      size="sm"
+                      onClick={handleRegenerateAI}
+                      disabled={isRegeneratingAI}
+                      className="bg-[#006c49] hover:bg-[#00563a] text-white text-xs font-semibold h-8 shadow-xs"
+                    >
+                      <RotateCw className="h-3.5 w-3.5 mr-1.5" />
+                      Thử tạo lại nhận định AI
+                    </Button>
+                  </div>
                 ) : (
                   <div className="py-6 text-center text-slate-400 space-y-3">
                     <Sparkles className="h-7 w-7 text-[#006c49] mx-auto" />
@@ -1268,10 +1370,10 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
 
           <div className="space-y-2">
             <h3 className="text-xl font-bold text-slate-900">
-              Phê duyệt & Hoàn tất Hồ sơ Thẩm định
+              Phê duyệt & Lưu Báo Cáo Chính Thức
             </h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Hồ sơ BCTC sẽ được khóa bảo mật, lưu vào lịch sử thẩm định và hiển thị đồng bộ trên Dashboard tổng quan.
+              Khi bấm lưu tại bước này, toàn bộ dữ liệu báo cáo, chỉ số tài chính và nhận định AI sẽ được lưu chính thức vào hệ thống và đồng bộ trên Dashboard tổng quan.
             </p>
           </div>
 
@@ -1292,11 +1394,11 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
               {isApproving ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
-                  Đang phê duyệt...
+                  Đang lưu & phê duyệt...
                 </>
               ) : (
                 <>
-                  Phê duyệt & Vào Dashboard Tổng quan
+                  Lưu chính thức & Vào Dashboard
                   <ArrowRight className="h-3.5 w-3.5 ml-2" />
                 </>
               )}
@@ -1305,7 +1407,7 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
         </Card>
       )}
 
-      {/* Modal Xác Nhận Xóa Phiên Báo Cáo */}
+      {/* Modal Xác Nhận Xóa / Hủy Phiên Báo Cáo */}
       {showDeleteSessionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
@@ -1324,10 +1426,14 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
 
             <div className="space-y-1.5">
               <h3 className="text-base font-bold text-slate-900">
-                Xác nhận xóa phiên báo cáo tài chính
+                {statement?.isDraft
+                  ? "Xác nhận hủy bản nháp phân tích"
+                  : "Xác nhận xóa phiên báo cáo tài chính"}
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Bạn có chắc chắn muốn xóa phiên báo cáo này khỏi hệ thống? Thao tác này sẽ xóa vĩnh viễn tệp scan/upload, toàn bộ 25 chỉ tiêu OCR, 14 tỷ số kiểm định, hồ sơ thẩm định và mọi nhận định AI liên quan.
+                {statement?.isDraft
+                  ? "Bạn đang ở quy trình phân tích và chưa lưu báo cáo chính thức. Hủy bỏ sẽ dọn sạch tệp scan và dữ liệu bóc tách tạm thời của phiên này."
+                  : "Báo cáo này đã được lưu chính thức. Thao tác xóa sẽ chuyển vào trạng thái lưu trữ bảo mật (xóa mềm), ẩn khỏi báo cáo và tổng quan Dashboard để bảo toàn lịch sử kiểm toán."}
               </p>
             </div>
 
@@ -1336,6 +1442,12 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
                 <span className="text-slate-400">Tệp tài liệu:</span>
                 <span className="font-semibold text-slate-800 font-mono truncate max-w-[220px]" title={statement?.fileName}>
                   {statement?.fileName || `#${statementId}`}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400">Trạng thái:</span>
+                <span className="font-semibold text-slate-800">
+                  {statement?.isDraft ? "Bản nháp tạm (Chưa lưu)" : "Báo cáo chính thức"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -1377,12 +1489,12 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
                 {isDeletingSession ? (
                   <>
                     <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                    Đang xóa dữ liệu...
+                    Đang xử lý...
                   </>
                 ) : (
                   <>
                     <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                    Xác nhận xóa vĩnh viễn
+                    {statement?.isDraft ? "Hủy & Xóa bản nháp" : "Xác nhận xóa mềm"}
                   </>
                 )}
               </Button>

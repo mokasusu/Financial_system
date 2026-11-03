@@ -279,6 +279,24 @@ public class FinancialStatementController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PostMapping("/{id}/finalize")
+    @Operation(
+            summary = "Finalize financial statement session",
+            description = "Transitions a draft financial statement session to official finalized status, integrating it into company analytics and dashboard."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Statement finalized successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Statement data not confirmed"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Financial statement not found")
+    })
+    public ResponseEntity<ApiResponse<FinancialStatementResponse>> finalizeFinancialStatement(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long id) {
+
+        FinancialStatementResponse response = financialStatementService.finalizeStatement(userPrincipal.getId(), id);
+        return ResponseEntity.ok(ApiResponse.success("Lưu và phê duyệt báo cáo tài chính thành công", response));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(
             summary = "Delete financial statement session",

@@ -29,6 +29,7 @@ export interface FinancialStatement {
   processingStatus?: string;
   statusDisplayName?: string;
   errorMessage?: string;
+  isDraft?: boolean;
   createdAt: string;
   updatedAt?: string;
 }

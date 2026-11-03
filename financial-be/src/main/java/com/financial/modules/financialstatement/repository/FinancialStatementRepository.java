@@ -14,9 +14,14 @@ import java.util.Optional;
 @Repository
 public interface FinancialStatementRepository extends JpaRepository<FinancialStatement, Long> {
 
-    Optional<FinancialStatement> findByIdAndCompanyId(Long id, Long companyId);
+    Optional<FinancialStatement> findByIdAndCompanyIdAndDeletedFalse(Long id, Long companyId);
+
+    default Optional<FinancialStatement> findByIdAndCompanyId(Long id, Long companyId) {
+        return findByIdAndCompanyIdAndDeletedFalse(id, companyId);
+    }
 
     @Query("SELECT fs FROM FinancialStatement fs WHERE fs.company.id = :companyId " +
+           "AND fs.deleted = false AND fs.isDraft = false " +
            "AND (:fiscalYear IS NULL OR fs.fiscalYear = :fiscalYear) " +
            "AND (:period IS NULL OR fs.period = :period) " +
            "AND (:status IS NULL OR fs.processingStatus = :status)")
@@ -26,5 +31,7 @@ public interface FinancialStatementRepository extends JpaRepository<FinancialSta
             @Param("period") String period,
             @Param("status") FinancialStatementStatus status,
             Pageable pageable);
+
+    java.util.List<FinancialStatement> findByIsDraftTrueAndCreatedAtBefore(java.time.LocalDateTime threshold);
 }
 

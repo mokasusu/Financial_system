@@ -63,7 +63,7 @@ class OcrApiClientTest {
 
     private void setupWebClientChain() {
         when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/api/v1/analyze")).thenReturn(requestBodySpec);
+        when(requestBodyUriSpec.uri("/api/v1/extract")).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
         when(requestBodySpec.body(any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
@@ -90,7 +90,7 @@ class OcrApiClientTest {
         setupWebClientChain();
         ReadTimeoutException timeoutEx = ReadTimeoutException.INSTANCE;
         WebClientRequestException requestException = new WebClientRequestException(
-                timeoutEx, HttpMethod.POST, URI.create("http://localhost:8000/api/v1/analyze"), new HttpHeaders()
+                timeoutEx, HttpMethod.POST, URI.create("http://localhost:8000/api/v1/extract"), new HttpHeaders()
         );
         when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.error(requestException));
 
@@ -158,4 +158,3 @@ class OcrApiClientTest {
                 });
     }
 }
-

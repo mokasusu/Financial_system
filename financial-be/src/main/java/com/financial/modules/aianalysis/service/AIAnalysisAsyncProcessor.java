@@ -43,6 +43,7 @@ public class AIAnalysisAsyncProcessor {
     private final ObjectMapper objectMapper;
 
     @Async(AsyncConfig.AI_TASK_EXECUTOR)
+    @Transactional
     public void processAIAnalysisAsync(Long analysisId, AIAnalysisInputPayload payload, String modelOverride) {
         log.info("Starting background AI financial analysis job for AIAnalysis ID {}", analysisId);
 
@@ -86,10 +87,10 @@ public class AIAnalysisAsyncProcessor {
             AIParsedAnalysisOutput parsed = objectMapper.readValue(cleanJson, AIParsedAnalysisOutput.class);
 
             // 4. Validate output
-            validateParsedOutput(analysis, parsed);
+            validateParsedOutput(analysis, parsed, payload);
 
             // 5. Populate structured child entities
-            populateChildEntities(analysis, parsed);
+            populateChildEntities(analysis, parsed, payload);
 
             // 6. Update analysis record
             analysis.setExecutiveSummary(parsed.getExecutiveSummary());
@@ -128,25 +129,37 @@ public class AIAnalysisAsyncProcessor {
                 : "Kỳ báo cáo";
         Double score = payload.getAssessment() != null && payload.getAssessment().getOverallScore() != null
                 ? payload.getAssessment().getOverallScore().doubleValue()
-                : 80.0;
-        String rating = payload.getAssessment() != null && payload.getAssessment().getHealthClassification() != null
+                : null;
+        String rawRating = payload.getAssessment() != null && payload.getAssessment().getHealthClassification() != null
                 ? payload.getAssessment().getHealthClassification()
-                : "AN TOÀN";
+                : null;
+        String rating = (rawRating == null || rawRating.equalsIgnoreCase("NOT_CONFIGURED"))
+                ? "CHƯA XẾP HẠNG"
+                : rawRating;
 
         StringBuilder summary = new StringBuilder();
-        summary.append(String.format(
-                "Dựa trên báo cáo tài chính kỳ %s của %s, hệ thống chấm điểm sức khỏe tài chính tổng thể đạt %.1f/100 (Xếp loại: %s). ",
-                period, companyName, score, rating));
+        if (score != null) {
+            summary.append(String.format(
+                    "Dựa trên báo cáo tài chính kỳ %s của %s, hệ thống chấm điểm sức khỏe tài chính tổng thể đạt %.1f/100 (Xếp loại: %s). ",
+                    period, companyName, score, rating));
+        } else {
+            summary.append(String.format(
+                    "Dựa trên báo cáo tài chính kỳ %s của %s, hệ thống đã ghi nhận các chỉ số tài chính cơ bản. ",
+                    period, companyName));
+        }
 
-        if (score >= 80) {
+        if (score != null && score >= 80) {
             summary.append(
                     "Doanh nghiệp sở hữu cơ cấu vốn lành mạnh, đòn bẩy nợ trong tầm kiểm soát an toàn và tính thanh khoản ngắn hạn được đảm bảo tốt, tạo tiền đề vững chắc cho việc mở rộng sản xuất kinh doanh.");
-        } else if (score >= 60) {
+        } else if (score != null && score >= 60) {
             summary.append(
                     "Tình hình tài chính ở mức cân bằng, khả năng thanh toán cơ bản đáp ứng các nghĩa vụ nợ đến hạn. Tuy nhiên, doanh nghiệp cần chú trọng tối ưu hóa chu chuyển vốn lưu động và kiểm soát tỷ lệ nợ vay.");
-        } else {
+        } else if (score != null) {
             summary.append(
                     "Tình hình tài chính đang đối mặt với một số áp lực về thanh khoản và chi phí vốn. Khuyến nghị ban điều hành sớm tái cấu trúc danh mục nợ và tăng cường thu hồi công nợ để cải thiện dòng tiền hoạt động.");
+        } else {
+            summary.append(
+                    "Doanh nghiệp cần tiếp tục hoàn thiện các chuẩn mực định mức ngành để có điểm số tổng thể và phân hạng chi tiết hơn.");
         }
 
         List<AIParsedAnalysisOutput.StrengthItem> strengths = new ArrayList<>();
@@ -154,7 +167,7 @@ public class AIAnalysisAsyncProcessor {
                 .title("Cơ cấu nguồn vốn và tính cân đối")
                 .description(
                         "Hệ số an toàn vốn và tỷ lệ tài sản bảo đảm duy trì ở mức ổn định theo chuẩn mực quy định.")
-                .evidence(List.of("Điểm số tổng thể: " + score + "/100"))
+                .evidence(List.of(score != null ? "Điểm số tổng thể: " + score + "/100" : "Dữ liệu kỳ " + period))
                 .build());
         strengths.add(AIParsedAnalysisOutput.StrengthItem.builder()
                 .title("Năng lực thanh toán ngắn hạn")
@@ -198,7 +211,7 @@ public class AIAnalysisAsyncProcessor {
                 .limitations(List.of("Nhận định dựa trên số liệu BCTC đã chốt đối soát theo chuẩn mực kế toán."))
                 .build();
 
-        populateChildEntities(analysis, output);
+        populateChildEntities(analysis, output, payload);
         analysis.setExecutiveSummary(output.getExecutiveSummary());
         analysis.setAiGeneratedComment(output.getExecutiveSummary());
         analysis.setFinalComment(output.getExecutiveSummary());
@@ -219,16 +232,44 @@ public class AIAnalysisAsyncProcessor {
         aiAnalysisRepository.save(analysis);
     }
 
-    private void populateChildEntities(AIAnalysis analysis, AIParsedAnalysisOutput parsed) {
-        // Clear existing children if any
-        if (analysis.getStrengths() != null)
-            analysis.getStrengths().clear();
-        if (analysis.getRisks() != null)
-            analysis.getRisks().clear();
-        if (analysis.getRecommendations() != null)
-            analysis.getRecommendations().clear();
-        if (analysis.getLimitations() != null)
-            analysis.getLimitations().clear();
+    private void populateChildEntities(AIAnalysis analysis, AIParsedAnalysisOutput parsed, AIAnalysisInputPayload payload) {
+        // Clear existing children safely
+        if (analysis.getStrengths() != null) {
+            try {
+                analysis.getStrengths().clear();
+            } catch (Exception ignored) {
+                analysis.setStrengths(new ArrayList<>());
+            }
+        } else {
+            analysis.setStrengths(new ArrayList<>());
+        }
+        if (analysis.getRisks() != null) {
+            try {
+                analysis.getRisks().clear();
+            } catch (Exception ignored) {
+                analysis.setRisks(new ArrayList<>());
+            }
+        } else {
+            analysis.setRisks(new ArrayList<>());
+        }
+        if (analysis.getRecommendations() != null) {
+            try {
+                analysis.getRecommendations().clear();
+            } catch (Exception ignored) {
+                analysis.setRecommendations(new ArrayList<>());
+            }
+        } else {
+            analysis.setRecommendations(new ArrayList<>());
+        }
+        if (analysis.getLimitations() != null) {
+            try {
+                analysis.getLimitations().clear();
+            } catch (Exception ignored) {
+                analysis.setLimitations(new ArrayList<>());
+            }
+        } else {
+            analysis.setLimitations(new ArrayList<>());
+        }
 
         // 1. Strengths
         if (parsed.getStrengths() != null) {
@@ -246,11 +287,22 @@ public class AIAnalysisAsyncProcessor {
 
         // Upstream risks map for matching
         Map<String, Long> upstreamRiskMap = new HashMap<>();
-        if (analysis.getRiskAnalysis() != null && analysis.getRiskAnalysis().getIdentifiedRisks() != null) {
-            for (IdentifiedRisk ir : analysis.getRiskAnalysis().getIdentifiedRisks()) {
-                if (ir.getRelatedRatioCode() != null) {
-                    upstreamRiskMap.put(ir.getRelatedRatioCode().toUpperCase(), ir.getId());
+        if (payload != null && payload.getDetectedRisks() != null) {
+            for (AIAnalysisInputPayload.RiskInfo ir : payload.getDetectedRisks()) {
+                if (ir.getRelatedRatioCode() != null && ir.getRiskId() != null) {
+                    upstreamRiskMap.put(ir.getRelatedRatioCode().toUpperCase(), ir.getRiskId());
                 }
+            }
+        } else if (analysis.getRiskAnalysis() != null) {
+            try {
+                if (analysis.getRiskAnalysis().getIdentifiedRisks() != null) {
+                    for (IdentifiedRisk ir : analysis.getRiskAnalysis().getIdentifiedRisks()) {
+                        if (ir.getRelatedRatioCode() != null) {
+                            upstreamRiskMap.put(ir.getRelatedRatioCode().toUpperCase(), ir.getId());
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
             }
         }
 
@@ -320,7 +372,7 @@ public class AIAnalysisAsyncProcessor {
         }
     }
 
-    private void validateParsedOutput(AIAnalysis analysis, AIParsedAnalysisOutput parsed) {
+    private void validateParsedOutput(AIAnalysis analysis, AIParsedAnalysisOutput parsed, AIAnalysisInputPayload payload) {
         if (parsed == null) {
             throw new IllegalArgumentException("Parsed AI analysis output is null");
         }
@@ -329,12 +381,23 @@ public class AIAnalysisAsyncProcessor {
         }
 
         // Upstream risks map for consistency verification
-        Map<Long, IdentifiedRisk> upstreamRisksById = new HashMap<>();
-        if (analysis.getRiskAnalysis() != null && analysis.getRiskAnalysis().getIdentifiedRisks() != null) {
-            for (IdentifiedRisk ir : analysis.getRiskAnalysis().getIdentifiedRisks()) {
-                if (ir.getId() != null) {
-                    upstreamRisksById.put(ir.getId(), ir);
+        Map<Long, Object> upstreamRisksById = new HashMap<>();
+        if (payload != null && payload.getDetectedRisks() != null) {
+            for (AIAnalysisInputPayload.RiskInfo ir : payload.getDetectedRisks()) {
+                if (ir.getRiskId() != null) {
+                    upstreamRisksById.put(ir.getRiskId(), ir);
                 }
+            }
+        } else if (analysis.getRiskAnalysis() != null) {
+            try {
+                if (analysis.getRiskAnalysis().getIdentifiedRisks() != null) {
+                    for (IdentifiedRisk ir : analysis.getRiskAnalysis().getIdentifiedRisks()) {
+                        if (ir.getId() != null) {
+                            upstreamRisksById.put(ir.getId(), ir);
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
             }
         }
 
@@ -379,16 +442,24 @@ public class AIAnalysisAsyncProcessor {
                 if (r.getSourceRiskId() != null && !r.getSourceRiskId().isBlank()) {
                     Long sourceId = parseLongOrNull(r.getSourceRiskId());
                     if (sourceId != null) {
-                        IdentifiedRisk upstream = upstreamRisksById.get(sourceId);
+                        Object upstream = upstreamRisksById.get(sourceId);
                         if (upstream == null) {
                             throw new IllegalArgumentException(
                                     "AI references non-existent risk ID: " + r.getSourceRiskId());
                         }
                         // Reject unsupported risk severity changes
-                        if (upstream.getSeverity() != null && upstream.getSeverity() != severity) {
+                        RiskSeverity upstreamSeverity = null;
+                        if (upstream instanceof IdentifiedRisk ir) {
+                            upstreamSeverity = ir.getSeverity();
+                        } else if (upstream instanceof AIAnalysisInputPayload.RiskInfo ri && ri.getSeverity() != null) {
+                            try {
+                                upstreamSeverity = RiskSeverity.valueOf(ri.getSeverity().trim().toUpperCase());
+                            } catch (Exception ignored) {}
+                        }
+                        if (upstreamSeverity != null && upstreamSeverity != severity) {
                             throw new IllegalArgumentException(
                                     "Unsupported risk severity modification for risk ID " + sourceId
-                                            + ": authoritative severity is " + upstream.getSeverity()
+                                            + ": authoritative severity is " + upstreamSeverity
                                             + ", but AI provided " + severity);
                         }
                     }

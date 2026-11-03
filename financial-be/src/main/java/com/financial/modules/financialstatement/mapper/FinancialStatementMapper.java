@@ -47,6 +47,7 @@ public class FinancialStatementMapper {
                 .processingCompletedAt(statement.getProcessingCompletedAt())
                 .createdAt(statement.getCreatedAt())
                 .updatedAt(statement.getUpdatedAt())
+                .isDraft(statement.getIsDraft())
                 .items(itemResponses)
                 .build();
     }

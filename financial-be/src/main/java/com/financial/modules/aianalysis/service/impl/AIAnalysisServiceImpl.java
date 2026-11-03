@@ -99,14 +99,28 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
         RiskAnalysis riskAnalysis = riskAnalysisRepository.findTopByFinancialStatementIdOrderByAnalysisVersionDesc(statement.getId())
                 .orElseThrow(() -> new UpstreamDataUnavailableException("RISK_ANALYSIS", "Risk analysis results are missing for financial statement ID: " + statement.getId() + ". Please execute risk analysis prior to AI analysis."));
 
-        // 7. Prevent concurrent duplicate generation
+        // 7. Prevent concurrent duplicate generation (auto-recovering stale jobs > 3 minutes)
         Optional<AIAnalysis> runningAnalysis = aiAnalysisRepository.findFirstByAssessmentIdAndStatusIn(
                 assessmentId,
                 List.of(AIAnalysisStatus.PENDING, AIAnalysisStatus.PROCESSING)
         );
         if (runningAnalysis.isPresent()) {
-            throw new ConcurrentAIAnalysisException(assessmentId,
-                    "An AI analysis is currently in progress for assessment ID: " + assessmentId + " (Status: " + runningAnalysis.get().getStatus() + ")");
+            AIAnalysis running = runningAnalysis.get();
+            java.time.LocalDateTime createdAt = running.getCreatedAt();
+            boolean isStale = createdAt != null && createdAt.isBefore(java.time.LocalDateTime.now().minusMinutes(3));
+
+            if (isStale) {
+                log.warn("Detected stale AIAnalysis ID {} for assessment ID {} in status {} created at {}. Marking as FAILED and allowing retry.",
+                        running.getId(), assessmentId, running.getStatus(), createdAt);
+                running.setStatus(AIAnalysisStatus.FAILED);
+                running.setErrorCode("ANALYSIS_TIMED_OUT");
+                running.setErrorMessage("AI analysis process timed out or was interrupted. Automatically cancelled to allow retry.");
+                running.setCompletedAt(java.time.LocalDateTime.now());
+                aiAnalysisRepository.save(running);
+            } else {
+                throw new ConcurrentAIAnalysisException(assessmentId,
+                        "Hệ thống đang tiến hành phân tích AI cho hồ sơ đánh giá #" + assessmentId + " (Trạng thái: " + running.getStatus() + "). Vui lòng đợi trong giây lát.");
+            }
         }
 
         // 8. Build structured input payload
