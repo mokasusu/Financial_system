@@ -7,6 +7,7 @@ import com.financial.modules.auth.service.AuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final AuthService authService;
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
+    @Value("${app.oauth2.redirect-uri:http://localhost:3000/oauth2/callback}")
+    private String defaultRedirectUri;
+
     public OAuth2AuthenticationSuccessHandler(@Lazy AuthService authService) {
         this.authService = authService;
     }
@@ -38,6 +42,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             AuthResponse authResponse = authService.processOAuth2Login(email, name, picture);
 
             String targetUrl = request.getParameter("redirect_uri");
+            if (targetUrl == null || targetUrl.isBlank()) {
+                targetUrl = defaultRedirectUri;
+            }
+
             if (targetUrl != null && !targetUrl.isBlank()) {
                 String redirectWithTokens = UriComponentsBuilder.fromUriString(targetUrl)
                         .queryParam("accessToken", authResponse.getAccessToken())
