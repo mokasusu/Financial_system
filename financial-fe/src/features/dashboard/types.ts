@@ -130,21 +130,27 @@ export interface DashboardRiskOverview {
 
 export interface AIStrength {
   title: string;
-  detail: string;
+  detail?: string;
+  description?: string;
   ratioCode?: string;
 }
 
 export interface AIRisk {
   title: string;
-  detail: string;
-  severity: "LOW" | "MEDIUM" | "HIGH";
+  detail?: string;
+  description?: string;
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  category?: string;
   ratioCode?: string;
+  sourceRiskId?: number;
 }
 
 export interface AIRecommendation {
-  priority: "HIGH" | "MEDIUM" | "LOW";
+  priority: "HIGH" | "MEDIUM" | "LOW" | "CRITICAL";
   title: string;
-  action: string;
+  action?: string;
+  description?: string;
+  relatedRiskId?: string;
 }
 
 export interface DashboardAICommentary {

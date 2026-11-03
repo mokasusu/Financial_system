@@ -44,10 +44,10 @@ export function AiExecutiveCommentary({
 
   const executiveSummary = commentary?.executiveSummary;
   const strengths = commentary?.strengths && commentary.strengths.length > 0
-    ? commentary.strengths.map((s) => s.detail).join("; ")
+    ? commentary.strengths.map((s) => s.description || s.detail || s.title).join("; ")
     : null;
   const recommendations = commentary?.recommendations && commentary.recommendations.length > 0
-    ? commentary.recommendations.map((r) => r.action).join("; ")
+    ? commentary.recommendations.map((r) => r.description || r.action || r.title).join("; ")
     : null;
   const finalComment = commentary?.finalComment;
   const aiGeneratedComment = commentary?.aiGeneratedComment;

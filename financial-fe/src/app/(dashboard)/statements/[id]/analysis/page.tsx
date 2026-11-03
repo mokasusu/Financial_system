@@ -1235,13 +1235,13 @@ export default function StatementAnalysisPipelinePage({ params }: AnalysisPagePr
                     {analysisOverview.aiCommentary.strengths && analysisOverview.aiCommentary.strengths.length > 0 && (
                       <p>
                         <strong>• Điểm mạnh cốt lõi:</strong>{" "}
-                        {analysisOverview.aiCommentary.strengths.map((s) => s.detail).join("; ")}
+                        {analysisOverview.aiCommentary.strengths.map((s) => s.description || s.detail || s.title).join("; ")}
                       </p>
                     )}
                     {analysisOverview.aiCommentary.recommendations && analysisOverview.aiCommentary.recommendations.length > 0 && (
                       <p>
                         <strong>• Khuyến nghị hành động:</strong>{" "}
-                        {analysisOverview.aiCommentary.recommendations.map((r) => r.action).join("; ")}
+                        {analysisOverview.aiCommentary.recommendations.map((r) => r.description || r.action || r.title).join("; ")}
                       </p>
                     )}
 
