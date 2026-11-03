@@ -12,6 +12,7 @@ Hệ thống Xử lý, Tính toán & Thẩm định Sức khỏe Tài chính Doa
 ## 1. Kiến trúc Backend
 
 * **Strict Server-Side Calculation:** Mọi phép tính 14 tỷ số tài chính, phương trình cân đối TT200/TT133, phân rã DuPont và ma trận cảnh báo rủi ro được xử lý độc quyền tại Backend sử dụng `BigDecimal` với `RoundingMode.HALF_UP`.
+* **Sơ đồ Kiến trúc Hệ thống:** Xem chi tiết sơ đồ luồng tổng thể và máy trạng thái tại [README.md - Sơ đồ Kiến trúc Hệ thống](../README.md#3-sơ-đồ-kiến-trúc-hệ-thống-system-architecture).
 * **Domain-Driven Modules:**
   * `auth`: Xác thực JWT Stateless (Access + Refresh Token), Google OAuth2.
   * `company`: Quản lý hồ sơ công ty và chuẩn mực kế toán.

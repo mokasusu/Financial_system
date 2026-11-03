@@ -24,6 +24,7 @@ Giao diện người dùng cho Hệ thống Thẩm định & Đánh giá Sức k
   * Xem và Chỉnh sửa thông tin pháp nhân doanh nghiệp (`PUT /api/companies/me`).
 * **Tiêu chí & Quy tắc Tài chính (`/settings`):**
   * Tùy biến ngưỡng 4 Core KPIs và 7 quy tắc cân bằng TT200/TT133.
+* **Sơ đồ Kiến trúc Hệ thống:** Xem chi tiết tại [README.md - Sơ đồ Kiến trúc Hệ thống](../README.md#3-sơ-đồ-kiến-trúc-hệ-thống-system-architecture).
 
 ---
 
@@ -39,7 +40,7 @@ Tạo file `.env.local` từ `.env.example`:
 ```bash
 cp .env.example .env.local
 ```
-*Ghi chú: Mặc định để trống `NEXT_PUBLIC_API_URL=` để tận dụng Next.js Proxy Rewrites (`next.config.ts`) tự động forward request sang `http://127.0.0.1:8080/api/*`, triệt tiêu hoàn toàn vấn đề CORS.*
+*Ghi chú: Mặc định NEXT_PUBLIC_API_URL=http://localhost:8080 khi chạy local. Khi deploy lên Vercel, cấu hình NEXT_PUBLIC_API_URL=https://financial-system-jc3a.onrender.com.*
 
 ### Chạy chế độ Phát triển (Dev Mode)
 ```bash

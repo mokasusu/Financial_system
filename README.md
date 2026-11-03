@@ -62,7 +62,152 @@ $$\text{[ 1 ] Tải lên} \longrightarrow \text{[ 2 ] OCR} \longrightarrow \text
 
 ---
 
-## 3. Cấu trúc Dự án (Project Structure)
+## 3. Sơ đồ Kiến trúc Hệ thống (System Architecture)
+
+### 3.1. Kiến trúc Tổng thể Đa tầng (High-Level Multi-Tier Architecture)
+
+Hệ thống được thiết kế theo mô hình **Phân tách Đa tầng (Multi-Tier Architecture)** kết hợp cấu trúc **Modular Monolith** ở Backend và **Server/Client Components** ở Frontend:
+
+```mermaid
+flowchart TD
+    subgraph ClientTier["1. TẦNG KHÁCH HÀNG (CLIENT TIER)"]
+        UserDevice["Trình duyệt Người dùng<br/>(Desktop / Laptop / Tablet)"]
+        subgraph NextApp["Frontend: Next.js 16 (Turbopack) & React 19"]
+            UI["Giao diện Người dùng<br/>(Tailwind CSS v4 & Radix UI)"]
+            Stores["Quản lý Trạng thái Client<br/>(Zustand Stores)"]
+            QueryLayer["Quản lý Server Cache & Thăm dò<br/>(TanStack Query v5)"]
+            AxiosClient["HTTP Client & JWT Interceptor<br/>(src/lib/api-client.ts)"]
+            
+            UI <--> Stores
+            UI <--> QueryLayer
+            QueryLayer <--> AxiosClient
+        end
+        UserDevice <--> UI
+    end
+
+    subgraph EdgeTier["2. TẦNG ĐIỀU HƯỚNG & PROXY (EDGE & GATEWAY)"]
+        VercelCDN["Vercel Edge Network / Next.js Rewrites<br/>(Reverse Proxy /api/* & /oauth2/*)"]
+        AxiosClient <-->|"HTTPS / REST API"| VercelCDN
+    end
+
+    subgraph BackendTier["3. TẦNG DỊCH VỤ NGHIỆP VỤ (BACKEND TIER - Spring Boot 3.5 & Java 21)"]
+        subgraph SecurityFilter["Bộ lọc An ninh (Security Filter Chain)"]
+            CorsConfig["CORS Configuration Source<br/>(Hỗ trợ Localhost & Vercel Domains)"]
+            JwtFilter["JWT Authentication Filter<br/>(Stateless Access Token)"]
+            OAuth2Success["OAuth2 Success Handler<br/>(Google Authentication)"]
+        end
+
+        subgraph Controllers["Tầng Điều phối REST API (Controllers)"]
+            AuthController["AuthController (/api/auth/*)"]
+            CompanyController["CompanyController (/api/companies/*)"]
+            StatementController["FinancialStatementController (/api/financial-statements/*)"]
+            DashboardController["DashboardController (/api/dashboard/*)"]
+            SettingsController["Criteria & Rules Controller (/api/settings/*)"]
+        end
+
+        subgraph CoreEngines["Động cơ Nghiệp vụ Chuyên sâu (Core Calculation Engines)"]
+            StatementMgr["Workflow & Pipeline Manager<br/>(Điều phối tiến trình 7 bước)"]
+            OcrClientEngine["OCR Async Client & Processor<br/>(Giao tiếp Microservice OCR)"]
+            IndicatorMapper["Indicator Mapping Service<br/>(Ánh xạ chỉ tiêu kế toán chuẩn)"]
+            ValidationEngine["Accounting Validation Engine<br/>(Kiểm tra 7 phương trình TT200/TT133)"]
+            CalcEngine["Financial Calculation Engine<br/>(14 Tỷ số & Phân rã DuPont 3 nhân tố)"]
+            HealthAssessment["Health Assessment Engine<br/>(Chấm điểm sức khỏe 0-100)"]
+            RiskAnalyzer["Risk Matrix & Heatmap Engine<br/>(Ma trận cảnh báo 4 nhóm rủi ro)"]
+            AIEngine["AI Analysis Async Processor<br/>(Tổng hợp prompt & sinh nhận định)"]
+        end
+
+        subgraph DataAccess["Tầng Truy xuất Dữ liệu (Spring Data JPA)"]
+            JPARepos["Repositories & Entities<br/>(Hibernate & HikariCP Pool)"]
+        end
+
+        VercelCDN <--> SecurityFilter
+        SecurityFilter --> Controllers
+        Controllers --> CoreEngines
+        CoreEngines --> JPARepos
+    end
+
+    subgraph ExternalTier["4. TẦNG DỊCH VỤ NGOÀI & TRÍ TUỆ NHÂN TẠO (EXTERNAL SERVICES)"]
+        OcrService["OCR Microservice Engine<br/>(Bóc tách số liệu bảng qua /api/v1/extract)"]
+        OpenRouterLLM["OpenRouter AI Gateway<br/>(LLM Chuyên gia Phân tích Tài chính)"]
+        GoogleIdentity["Google Identity Platform<br/>(OAuth2 OpenID Connect)"]
+    end
+
+    subgraph StorageTier["5. TẦNG LƯU TRỮ DỮ LIỆU (DATABASE & STORAGE)"]
+        MySQLDB[("Cơ sở Dữ liệu MySQL 8.0<br/>(Quan hệ User, Company, Statement, Indicator...)")]
+        FileStorage[("Lưu trữ Tệp Cục bộ / Docker Volume<br/>(/app/uploads/statements)")]
+    end
+
+    OcrClientEngine <-->|"Multipart REST Request"| OcrService
+    AIEngine <-->|"REST API / OpenRouter Key"| OpenRouterLLM
+    OAuth2Success <-->|"OAuth2 Token Exchange"| GoogleIdentity
+    JPARepos <--> MySQLDB
+    StatementMgr <--> FileStorage
+```
+
+---
+
+### 3.2. Sơ đồ Luồng Dữ liệu Quy trình Thẩm định 7 Bước (Data Flow Pipeline)
+
+Toàn bộ chu trình thẩm định Báo cáo Tài chính diễn ra tuần tự với cơ chế đồng bộ trạng thái chặt chẽ giữa Client và Backend:
+
+```mermaid
+flowchart LR
+    Step1["[ Bước 1 ]<br/>Tải lên Tệp<br/>(PDF / Ảnh Scan)"]
+    Step2["[ Bước 2 ]<br/>Bóc tách OCR<br/>(Async Polling 2.5s)"]
+    Step3["[ Bước 3 ]<br/>Rà soát Số liệu<br/>(Split-Screen)"]
+    Step4["[ Bước 4 ]<br/>Tính toán & Cân đối<br/>(7 Equs & 14 Ratios)"]
+    Step5["[ Bước 5 ]<br/>Thẩm định AI<br/>(Scoring & Commentary)"]
+    Step6["[ Bước 6 ]<br/>Hiệu chỉnh<br/>(Review & Edit)"]
+    Step7["[ Bước 7 ]<br/>Lưu trữ & Phê duyệt<br/>(Khóa phiên BCTC)"]
+    Dashboard["Trung tâm Điều hành<br/>Dashboard 6 Khối"]
+
+    Step1 -->|"Kích hoạt OCR ngầm"| Step2
+    Step2 -->|"Tự động chuyển bước"| Step3
+    Step3 -->|"Xác nhận chốt Draft"| Step4
+    Step4 -->|"Kích hoạt Đánh giá & Rủi ro"| Step5
+    Step5 -->|"Gợi ý nhận định chuyên gia"| Step6
+    Step6 -->|"Chốt báo cáo cuối"| Step7
+    Step7 -->|"Tái nạp toàn bộ dữ liệu"| Dashboard
+```
+
+---
+
+### 3.3. Sơ đồ Máy Trạng thái Vòng đời BCTC (Statement State Machine)
+
+Mỗi phiên BCTC được quản lý bởi một Máy trạng thái hữu hạn (Finite State Machine) nhằm đảm bảo tính toàn vẹn dữ liệu và khả năng khôi phục khi tải lại trang (F5 Resilience):
+
+```mermaid
+stateDiagram-v2
+    [*] --> UPLOADED: Người dùng nạp tệp BCTC (Bước 1)
+    UPLOADED --> OCR_PROCESSING: Gọi POST /api/financial-statements/{id}/extract
+    OCR_PROCESSING --> REVIEWING_DATA: OCR hoàn tất, trích xuất chỉ tiêu thành công
+    OCR_PROCESSING --> FAILED: Lỗi giải mã OCR / Tệp không hợp lệ
+    REVIEWING_DATA --> REVIEWING_DATA: Chuyên viên cập nhật trực tiếp chỉ tiêu Draft (Bước 3)
+    REVIEWING_DATA --> DATA_CONFIRMED: Chuyên viên chốt số liệu (Bước 4)
+    DATA_CONFIRMED --> CALCULATING: Kích hoạt bộ tính toán 14 tỷ số & 7 cân đối kế toán
+    CALCULATING --> CALCULATED: Tính toán hoàn tất (Lưu bảng kết quả)
+    CALCULATED --> AI_ANALYZING: Kích hoạt OpenRouter AI thẩm định chuyên sâu (Bước 5)
+    AI_ANALYZING --> AI_ANALYZED: AI trả kết quả phân tích & khuyến nghị
+    AI_ANALYZING --> FAILED: Quá thời gian chờ phản hồi LLM
+    AI_ANALYZED --> COMPLETED: Chuyên viên hiệu chỉnh & Phê duyệt báo cáo (Bước 6-7)
+    COMPLETED --> [*]: Khóa phiên thẩm định & Nạp lên Dashboard
+```
+
+---
+
+### 3.4. Bảng Diễn giải Luồng Giao tiếp giữa các Phân hệ
+
+| Phân hệ Nguồn | Phân hệ Đích | Giao thức / Định dạng | Cơ chế Hoạt động | Mục đích |
+| :--- | :--- | :--- | :--- | :--- |
+| **Frontend (Next.js)** | **Backend (Spring Boot)** | HTTPS / REST / JSON | JWT Bearer Token, Axios Interceptors tự làm mới Token | Gửi yêu cầu thao tác người dùng, nạp dữ liệu bảng biểu, đồ thị |
+| **Frontend (Next.js)** | **Vercel Edge Network** | HTTPS / Edge Rewrite | Proxy ngược `/api/*` và `/oauth2/*` về Backend URL | Tránh lỗi CORS và lỗi Private Network Access (PNA) |
+| **Backend (Spring Boot)** | **OCR Microservice** | HTTP / Multipart Form-Data | Bất đồng bộ (`@Async`, `ThreadPoolTaskExecutor`) | Bóc tách tự động bảng cân đối kế toán, kết quả kinh doanh và lưu chuyển tiền tệ |
+| **Backend (Spring Boot)** | **OpenRouter API** | HTTPS / REST / JSON | Spring `RestClient` với cơ chế Retry & Timeout 120s | Gửi dữ liệu tỷ số tài chính cho LLM phân tích, sinh nhận định điều hành |
+| **Backend (Spring Boot)** | **MySQL Database** | TCP / JDBC (HikariCP) | ORM Spring Data JPA / Hibernate | Lưu trữ quan hệ: doanh nghiệp, phiên BCTC, chỉ tiêu thô, tỷ số, ma trận rủi ro |
+
+---
+
+## 4. Cấu trúc Dự án (Project Structure)
 
 ```
 Financial_system/
@@ -127,7 +272,7 @@ Financial_system/
 
 ---
 
-## 4. Công nghệ Sử dụng (Tech Stack)
+## 5. Công nghệ Sử dụng (Tech Stack)
 
 ### Backend
 * **Ngôn ngữ & Framework:** Java 21, Spring Boot 3.5.x
@@ -147,9 +292,9 @@ Financial_system/
 
 ---
 
-## 5. Hướng dẫn Cài đặt & Khởi chạy (Getting Started)
+## 6. Hướng dẫn Cài đặt & Khởi chạy (Getting Started)
 
-### 5.1. Yêu cầu Tiên quyết (Prerequisites)
+### 6.1. Yêu cầu Tiên quyết (Prerequisites)
 * **Java Development Kit (JDK):** Phiên bản 21 trở lên (khuyên dùng Eclipse Temurin 21 hoặc OpenJDK 21)
 * **Node.js:** Phiên bản 18.18 trở lên (khuyên dùng Node 20 LTS)
 * **Trình quản lý gói:** npm, pnpm hoặc yarn
@@ -157,7 +302,7 @@ Financial_system/
 
 ---
 
-### 5.2. Khởi chạy Backend (`financial-be`)
+### 6.2. Khởi chạy Backend (`financial-be`)
 
 1. **Di chuyển vào thư mục backend:**
    ```bash
@@ -199,7 +344,7 @@ Financial_system/
 
 ---
 
-### 5.3. Khởi chạy Frontend (`financial-fe`)
+### 6.3. Khởi chạy Frontend (`financial-fe`)
 
 1. **Di chuyển vào thư mục frontend:**
    ```bash
@@ -216,7 +361,7 @@ Financial_system/
    ```bash
    cp .env.example .env.local
    ```
-   *(Mặc định để trống `NEXT_PUBLIC_API_URL=` để Next.js tự động chuyển tiếp request `/api/*` qua `http://127.0.0.1:8080/api/*`, tránh hoàn toàn lỗi CORS khi chạy local).*
+   *(Mặc định `NEXT_PUBLIC_API_URL=http://localhost:8080` khi chạy local. Khi deploy lên Vercel, cấu hình `NEXT_PUBLIC_API_URL=https://financial-system-jc3a.onrender.com`).*
 
 4. **Khởi chạy máy chủ phát triển:**
    ```bash
@@ -229,7 +374,7 @@ Financial_system/
 
 ---
 
-## 6. Danh mục API Endpoints Chính (Core API Endpoints)
+## 7. Danh mục API Endpoints Chính (Core API Endpoints)
 
 | Phân hệ | Phương thức | Đường dẫn API | Mô tả chức năng |
 | :--- | :--- | :--- | :--- |
@@ -255,17 +400,17 @@ Financial_system/
 
 ---
 
-## 7. Tài liệu Kỹ thuật Chi tiết (Documentation)
+## 8. Tài liệu Kỹ thuật Chi tiết (Documentation)
 
 Hệ thống đi kèm bộ tài liệu đặc tả kỹ thuật chi tiết đặt tại thư mục `docs/`:
-* 📘 [Tài liệu Tích hợp API Frontend (`FRONTEND_INTEGRATION_GUIDE.md`)](file:///c:/Users/admin/Desktop/A_Ky1_Nam4/Cong_nghe_tai_chinh/Financial_system/financial-be/docs/FRONTEND_INTEGRATION_GUIDE.md)
-* 📐 [Đặc tả Thiết kế API Swagger OpenAPI 3.0 (`SWAGGER_API_DESIGN.md`)](file:///c:/Users/admin/Desktop/A_Ky1_Nam4/Cong_nghe_tai_chinh/Financial_system/financial-be/docs/SWAGGER_API_DESIGN.md)
-* 🎯 [Đặc tả Kiến trúc Thẩm định theo Phiên (`SESSION_BASED_ANALYSIS_SPEC.md`)](file:///c:/Users/admin/Desktop/A_Ky1_Nam4/Cong_nghe_tai_chinh/Financial_system/financial-fe/docs/SESSION_BASED_ANALYSIS_SPEC.md)
-* 🎨 [Quy chuẩn Thiết kế Giao diện UI/UX & Design Tokens (`UI_UX_DESIGN_SPEC.md`)](file:///c:/Users/admin/Desktop/A_Ky1_Nam4/Cong_nghe_tai_chinh/Financial_system/financial-fe/docs/UI_UX_DESIGN_SPEC.md)
+* 📘 [Tài liệu Tích hợp API Frontend (`FRONTEND_INTEGRATION_GUIDE.md`)](financial-be/docs/FRONTEND_INTEGRATION_GUIDE.md)
+* 📐 [Đặc tả Thiết kế API Swagger OpenAPI 3.0 (`SWAGGER_API_DESIGN.md`)](financial-be/docs/SWAGGER_API_DESIGN.md)
+* 🎯 [Đặc tả Kiến trúc Thẩm định theo Phiên (`SESSION_BASED_ANALYSIS_SPEC.md`)](financial-fe/docs/SESSION_BASED_ANALYSIS_SPEC.md)
+* 🎨 [Quy chuẩn Thiết kế Giao diện UI/UX & Design Tokens (`UI_UX_DESIGN_SPEC.md`)](financial-fe/docs/UI_UX_DESIGN_SPEC.md)
 
 ---
 
-## 8. Bảo mật & Quy ước Đóng góp (Security & Guidelines)
+## 9. Bảo mật & Quy ước Đóng góp (Security & Guidelines)
 
 * **Bảo vệ Bí mật (Secrets Management):** Không bao giờ đưa file `.env` hoặc các khóa bí mật (`JWT_SECRET`, mật khẩu Database, `OPENROUTER_API_KEY`) lên Git repository. File `.gitignore` ở thư mục gốc và thư mục con đã được cấu hình chặt chẽ để ngăn chặn rò rỉ thông tin.
 * **Nguyên tắc Tính toán:** Tuyệt đối không thực hiện bất kỳ phép tính tỷ số tài chính hay logic kiểm tra cân bằng nào tại Frontend. Tất cả phải được ủy quyền xử lý từ Backend.
@@ -273,7 +418,7 @@ Hệ thống đi kèm bộ tài liệu đặc tả kỹ thuật chi tiết đặ
 
 ---
 
-## 9. Bản quyền & Thông tin Dự án (License & Credits)
+## 10. Bản quyền & Thông tin Dự án (License & Credits)
 
 * **Dự án:** Hệ thống Đánh giá Sức khỏe Tài chính Doanh nghiệp (Financial Health Assessment System)
 * **Học phần:** Công nghệ Tài chính (FinTech)
