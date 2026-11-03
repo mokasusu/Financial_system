@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { AuthLayout } from "@/features/auth/components/auth-layout";
+import { GoogleLoginButton } from "@/features/auth/components/google-login-button";
 import { registerSchema, type RegisterFormData } from "@/features/auth/schemas";
 import { authService } from "@/features/auth/services";
 import { useAuthStore } from "@/stores/auth-store";
@@ -191,6 +192,21 @@ export default function RegisterPage() {
             "Đăng ký ngay"
           )}
         </Button>
+
+        <div className="relative my-3">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-200" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white px-2 text-slate-400">hoặc</span>
+          </div>
+        </div>
+
+        <GoogleLoginButton
+          text="signup_with"
+          onError={(msg) => setErrorMessage(msg)}
+          disabled={isLoading}
+        />
 
         <p className="text-center text-xs text-slate-500 pt-2">
           Đã có tài khoản chuyên viên?{" "}
