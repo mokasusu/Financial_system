@@ -40,19 +40,34 @@ export function VisualAnalytics({
       (rc) => rc.ratioCode?.toUpperCase() === config.code.toUpperCase()
     );
 
-    let actVal = found?.actualValue ?? 0;
-    if (actVal !== null && actVal !== undefined && (config.unit === "PERCENT" || found?.unit === "PERCENT" || found?.unit === "%")) {
-      actVal = Math.abs(actVal) <= 1.0 && actVal !== 0 ? actVal * 100 : actVal;
+    const isPercent =
+      config.unit === "PERCENT" || found?.unit === "PERCENT" || found?.unit === "%";
+
+    let rawVal = found?.actualValue ?? 0;
+    let pctActual = 0;
+    if (rawVal !== null && rawVal !== undefined) {
+      pctActual = isPercent
+        ? Math.abs(rawVal) <= 1.0 && rawVal !== 0
+          ? rawVal * 100
+          : rawVal
+        : 0;
     }
 
-    const thrVal = config.industryBenchmark;
+    const pctBenchmark = config.industryBenchmark;
+
+    // Quy đổi về hệ số lần (times: chia 100 nếu là %) để đồng nhất thang đo trục tung
+    const chartActual = isPercent ? pctActual / 100 : rawVal;
+    const chartBenchmark = isPercent ? pctBenchmark / 100 : pctBenchmark;
 
     return {
       name: config.shortName,
       fullName: config.name,
-      actual: Number(Number(actVal).toFixed(2)),
-      benchmark: Number(Number(thrVal).toFixed(2)),
-      unit: config.unit === "PERCENT" ? "%" : config.unit === "DAYS" ? " ngày" : "x",
+      actual: Number(chartActual.toFixed(2)),
+      benchmark: Number(chartBenchmark.toFixed(2)),
+      isPercent,
+      origActual: Number(pctActual.toFixed(2)),
+      origBenchmark: Number(pctBenchmark.toFixed(2)),
+      unit: isPercent ? "%" : config.unit === "DAYS" ? " ngày" : "x",
     };
   });
 
@@ -78,12 +93,17 @@ export function VisualAnalytics({
       {/* 8 Ratios Grouped Bar Chart (2 cols on lg) */}
       <Card className="lg:col-span-2 bg-white">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-700">
-            SO SÁNH 8 TỶ SỐ TÀI CHÍNH TRỌNG YẾU VS NGƯỠNG NGÀNH
-          </CardTitle>
+          <div>
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              SO SÁNH 8 TỶ SỐ TÀI CHÍNH TRỌNG YẾU VS NGƯỠNG NGÀNH
+            </CardTitle>
+            <p className="text-[10px] text-slate-400 mt-0.5">
+              Đồng nhất thang đo: các chỉ số (%) được quy đổi sang hệ số lần (x) trên biểu đồ
+            </p>
+          </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="text-[11px] font-semibold text-[#006c49] hover:text-[#005237] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+            className="text-[11px] font-semibold text-[#006c49] hover:text-[#005237] hover:underline flex items-center gap-1 cursor-pointer transition-colors shrink-0"
           >
             <SlidersHorizontal className="h-3 w-3" />
             <span>Tùy chỉnh ngưỡng</span>
@@ -104,13 +124,24 @@ export function VisualAnalytics({
                   textAnchor="end"
                   interval={0}
                 />
-                <YAxis tick={{ fontSize: 10, fill: "#64748b" }} />
+                <YAxis
+                  tick={{ fontSize: 10, fill: "#64748b" }}
+                  tickFormatter={(val) => `${val}x`}
+                />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#ffffff",
                     borderColor: "#e2e8f0",
                     borderRadius: "8px",
                     fontSize: "12px",
+                  }}
+                  formatter={(val: any, name: any, item: any) => {
+                    const isPct = item.payload?.isPercent;
+                    const num = Number(val);
+                    if (isPct) {
+                      return [`${num.toFixed(2)}x (${(num * 100).toFixed(2)}%)`, name];
+                    }
+                    return [`${num.toFixed(2)}x`, name];
                   }}
                 />
                 <Legend

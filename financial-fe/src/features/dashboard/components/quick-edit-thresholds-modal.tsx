@@ -314,6 +314,11 @@ export function QuickEditThresholdsModal({
                                 {unitSuffix}
                               </span>
                             </div>
+                            {item.unit === "PERCENT" && (
+                              <span className="text-[9px] text-slate-400 block mt-0.5">
+                                Quy đổi: {(item.industryBenchmark / 100).toFixed(2)}x
+                              </span>
+                            )}
                           </td>
                         </tr>
                       );

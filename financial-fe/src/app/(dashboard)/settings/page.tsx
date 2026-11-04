@@ -555,6 +555,7 @@ export default function SettingsPage() {
                               </div>
                               <span className="text-[10px] text-emerald-700 block">
                                 {isHigher ? `Đạt từ ≥ ${item.safeThreshold}${unitSuffix}` : `Tối đa ≤ ${item.safeThreshold}${unitSuffix}`}
+                                {item.unit === "PERCENT" && ` (Quy đổi: ${(item.safeThreshold / 100).toFixed(2)}x)`}
                               </span>
                             </div>
 
@@ -583,6 +584,7 @@ export default function SettingsPage() {
                               </div>
                               <span className="text-[10px] text-amber-700 block">
                                 {isHigher ? `Cận chuẩn ≥ ${item.warningThreshold}${unitSuffix}` : `Cận chuẩn ≤ ${item.warningThreshold}${unitSuffix}`}
+                                {item.unit === "PERCENT" && ` (Quy đổi: ${(item.warningThreshold / 100).toFixed(2)}x)`}
                               </span>
                             </div>
                           </div>
@@ -707,6 +709,11 @@ export default function SettingsPage() {
                                   {unitSuffix}
                                 </span>
                               </div>
+                              {item.unit === "PERCENT" && (
+                                <span className="text-[10px] text-slate-400 block mt-0.5">
+                                  Quy đổi biểu đồ: {(item.industryBenchmark / 100).toFixed(2)}x
+                                </span>
+                              )}
                             </td>
 
                             <td className="p-3 text-right">
