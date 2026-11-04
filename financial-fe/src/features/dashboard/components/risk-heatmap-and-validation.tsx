@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import type { DashboardValidation, DashboardCategory } from "../types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, AlertTriangle, XCircle, ExternalLink } from "lucide-react";
+import { CheckCircle2, AlertTriangle, XCircle, SlidersHorizontal } from "lucide-react";
+import { useRatioThresholds, evaluateRatioHealth } from "../threshold-store";
+import { QuickEditThresholdsModal } from "./quick-edit-thresholds-modal";
 
 interface RiskHeatmapAndValidationProps {
   validation?: DashboardValidation;
@@ -14,28 +17,60 @@ export function RiskHeatmapAndValidation({
   validation,
   financialRatios,
 }: RiskHeatmapAndValidationProps) {
-  // Dynamic 14-ratio matrix from API
-  const matrixData =
-    financialRatios && financialRatios.length > 0
-      ? financialRatios.map((group) => ({
-          group: group.categoryName,
-          items: group.ratios.map((r) => {
-            let formattedVal =
-              r.value !== null && r.value !== undefined
-                ? r.unit === "PERCENT" || r.unit === "%"
-                  ? `${(r.value * 100 > 1 ? r.value : r.value * 100).toFixed(2)}%`
-                  : r.unit === "DAYS" || r.unit === "NGAY"
-                  ? `${r.value} ngày`
-                  : `${Number(r.value).toFixed(2)}x`
-                : "—";
-            return {
-              name: r.name,
-              val: formattedVal,
-              status: r.evaluationStatus,
-            };
-          }),
-        }))
-      : [];
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { thresholds } = useRatioThresholds();
+
+  // Danh mục 4 nhóm tài chính tiêu chuẩn
+  const categoryGroups: { key: string; name: string }[] = [
+    { key: "LIQUIDITY", name: "Thanh khoản" },
+    { key: "SOLVENCY", name: "Đòn bẩy" },
+    { key: "PROFITABILITY", name: "Sinh lời" },
+    { key: "EFFICIENCY", name: "Hoạt động" },
+  ];
+
+  // Trích xuất map giá trị thực tế của các tỷ số từ API
+  const apiRatioMap = new Map<string, number | null>();
+  if (financialRatios && financialRatios.length > 0) {
+    financialRatios.forEach((cat) => {
+      cat.ratios?.forEach((r) => {
+        if (r.code) {
+          apiRatioMap.set(r.code.toUpperCase(), r.value ?? null);
+        }
+      });
+    });
+  }
+
+  // Tạo dữ liệu cho Ma trận 14 tỷ số tài chính
+  const matrixData = categoryGroups.map((cat) => {
+    const groupThresholds = thresholds.filter((t) => t.category === cat.key);
+    return {
+      group: cat.name,
+      items: groupThresholds.map((config) => {
+        const rawVal = apiRatioMap.get(config.code.toUpperCase()) ?? null;
+        const evaluation = evaluateRatioHealth(rawVal, config);
+        const unitSuffix = config.unit === "PERCENT" ? "%" : config.unit === "DAYS" ? " ngày" : "x";
+        const isHigher = config.direction === "HIGHER_IS_BETTER";
+
+        const tooltip =
+          `${config.name} (${config.code})\n` +
+          `• Giá trị thực tế: ${evaluation.formattedValue}\n` +
+          `• Đánh giá: ${evaluation.label}\n` +
+          `• Mốc An toàn (Xanh): ${isHigher ? "≥" : "≤"} ${config.safeThreshold}${unitSuffix}\n` +
+          `• Mốc Lưu ý (Vàng): ${isHigher ? "≥" : "≤"} ${config.warningThreshold}${unitSuffix}\n` +
+          `• Công thức: ${config.formula}`;
+
+        return {
+          code: config.code,
+          name: config.shortName,
+          fullName: config.name,
+          val: evaluation.formattedValue,
+          status: evaluation.status,
+          label: evaluation.label,
+          tooltip,
+        };
+      }),
+    };
+  });
 
   const validationList =
     validation?.results && validation.results.length > 0
@@ -53,65 +88,62 @@ export function RiskHeatmapAndValidation({
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* Khối 3C: Ma trận Cảnh báo Rủi ro 14 Tỷ số (2 cols on lg) */}
       <Card className="lg:col-span-2 bg-white flex flex-col justify-between">
-        <CardHeader className="pb-3 border-b border-slate-100">
+        <CardHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-700">
             MA TRẬN CẢNH BÁO RỦI RO 14 TỶ SỐ TÀI CHÍNH
           </CardTitle>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="text-[11px] font-semibold text-[#006c49] hover:text-[#005237] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+          >
+            <SlidersHorizontal className="h-3 w-3" />
+            <span>Tùy chỉnh ngưỡng</span>
+          </button>
         </CardHeader>
         <CardContent className="p-4 space-y-2 flex-1 flex flex-col justify-between">
-          {matrixData.length > 0 ? (
-            <div className="space-y-2">
-              {matrixData.map((row) => (
-                <div key={row.group} className="grid grid-cols-5 gap-2 items-center">
-                  {/* Row Header */}
-                  <div className="text-[11px] font-bold text-slate-600 truncate">
-                    {row.group}
-                  </div>
-
-                  {/* 4 Cells */}
-                  {row.items.map((cell) => {
-                    const isDanger = cell.status === "DANGER" || cell.status === "FAIL";
-                    const isWarning = cell.status === "WARNING" || cell.status === "LUU_Y";
-                    const isSafe = cell.status === "PASS" || cell.status === "SAFE";
-                    const bgColor = isDanger
-                      ? "bg-[#ef4444]"
-                      : isWarning
-                      ? "bg-[#f59e0b]"
-                      : isSafe
-                      ? "bg-[#22c55e]"
-                      : "bg-slate-400";
-
-                    return (
-                      <div
-                        key={cell.name}
-                        className={`p-2.5 rounded-lg text-center transition-all ${bgColor} text-white shadow-xs hover:brightness-105`}
-                      >
-                        <div className="text-xs font-mono font-bold leading-tight">
-                          {cell.val}
-                        </div>
-                        <div
-                          className="text-[10px] font-medium opacity-95 truncate mt-0.5"
-                          title={cell.name}
-                        >
-                          {cell.name}
-                        </div>
-                      </div>
-                    );
-                  })}
+          <div className="space-y-2">
+            {matrixData.map((row) => (
+              <div key={row.group} className="grid grid-cols-5 gap-2 items-center">
+                {/* Row Header */}
+                <div className="text-[11px] font-bold text-slate-600 truncate">
+                  {row.group}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="py-12 text-center text-slate-400 space-y-2 my-auto">
-              <AlertTriangle className="h-8 w-8 mx-auto text-amber-500/80 mb-2" />
-              <p className="font-semibold text-xs text-slate-700">
-                Chưa có dữ liệu tỷ số tài chính cho phiên BCTC này
-              </p>
-              <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
-                Vui lòng vào menu &quot;Phân tích BCTC&quot; để chạy quy trình bóc tách OCR và tính toán chỉ số.
-              </p>
-            </div>
-          )}
+
+                {/* Cells */}
+                {row.items.map((cell) => {
+                  const isSafe = cell.status === "SAFE";
+                  const isWarning = cell.status === "WARNING";
+                  const isDanger = cell.status === "DANGER";
+
+                  const bgColor = isSafe
+                    ? "bg-[#22c55e]"
+                    : isWarning
+                    ? "bg-[#f59e0b]"
+                    : isDanger
+                    ? "bg-[#ef4444]"
+                    : "bg-slate-300 text-slate-700";
+
+                  return (
+                    <div
+                      key={cell.code}
+                      className={`p-2.5 rounded-lg text-center transition-all ${bgColor} text-white shadow-2xs hover:brightness-105 cursor-help`}
+                      title={cell.tooltip}
+                    >
+                      <div className="text-xs font-mono font-bold leading-tight">
+                        {cell.val}
+                      </div>
+                      <div
+                        className="text-[10px] font-medium opacity-95 truncate mt-0.5"
+                        title={cell.fullName}
+                      >
+                        {cell.name}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
 
           {/* Matrix Legend */}
           <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-4 text-[11px] text-slate-500">
@@ -207,6 +239,12 @@ export function RiskHeatmapAndValidation({
           </div>
         </CardContent>
       </Card>
+
+      <QuickEditThresholdsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialTab="matrix14"
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -15,6 +16,9 @@ import {
 } from "recharts";
 import type { DashboardVisualAnalytics } from "../types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useRatioThresholds } from "../threshold-store";
+import { QuickEditThresholdsModal } from "./quick-edit-thresholds-modal";
+import { SlidersHorizontal } from "lucide-react";
 
 interface VisualAnalyticsProps {
   data: DashboardVisualAnalytics;
@@ -25,23 +29,34 @@ export function VisualAnalytics({
   data,
   companyShortName = "Doanh nghiệp",
 }: VisualAnalyticsProps) {
-  // 1. Data for 8 Key Ratios Bar Chart
-  const chartData =
-    data.ratioComparisons && data.ratioComparisons.length > 0
-      ? data.ratioComparisons.slice(0, 8).map((item) => {
-          let actVal = item.actualValue ?? 0;
-          let thrVal = item.configuredThreshold ?? 0;
-          if (item.unit === "PERCENT" || item.unit === "%") {
-            actVal = actVal * 100 > 1 ? actVal : actVal * 100;
-            thrVal = thrVal * 100 > 1 ? thrVal : thrVal * 100;
-          }
-          return {
-            name: item.ratioName.replace("Khả năng ", "").replace("Tỷ suất ", ""),
-            actual: Number(actVal.toFixed(2)),
-            benchmark: Number(thrVal.toFixed(2)),
-          };
-        })
-      : [];
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { thresholds } = useRatioThresholds();
+
+  // 1. Data for 8 Key Ratios Bar Chart from configured key ratios
+  const keyConfigs = thresholds.filter((t) => t.isKeyRatio).slice(0, 8);
+
+  const chartData = keyConfigs.map((config) => {
+    const found = data.ratioComparisons?.find(
+      (rc) => rc.ratioCode?.toUpperCase() === config.code.toUpperCase()
+    );
+
+    let actVal = found?.actualValue ?? 0;
+    if (actVal !== null && actVal !== undefined && (config.unit === "PERCENT" || found?.unit === "PERCENT" || found?.unit === "%")) {
+      actVal = Math.abs(actVal) <= 1.0 && actVal !== 0 ? actVal * 100 : actVal;
+    }
+
+    const thrVal = config.industryBenchmark;
+
+    return {
+      name: config.shortName,
+      fullName: config.name,
+      actual: Number(Number(actVal).toFixed(2)),
+      benchmark: Number(Number(thrVal).toFixed(2)),
+      unit: config.unit === "PERCENT" ? "%" : config.unit === "DAYS" ? " ngày" : "x",
+    };
+  });
+
+  const hasChartData = chartData.some((d) => d.actual > 0) || (data.ratioComparisons && data.ratioComparisons.length > 0);
 
   // 2. Data for Capital Structure Donut Chart
   const totalAssets = data.capitalStructure?.totalAssets || 0;
@@ -62,10 +77,17 @@ export function VisualAnalytics({
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* 8 Ratios Grouped Bar Chart (2 cols on lg) */}
       <Card className="lg:col-span-2 bg-white">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-700">
             SO SÁNH 8 TỶ SỐ TÀI CHÍNH TRỌNG YẾU VS NGƯỠNG NGÀNH
           </CardTitle>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="text-[11px] font-semibold text-[#006c49] hover:text-[#005237] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+          >
+            <SlidersHorizontal className="h-3 w-3" />
+            <span>Tùy chỉnh ngưỡng</span>
+          </button>
         </CardHeader>
         <CardContent className="h-72 pt-2 flex items-center justify-center">
           {chartData.length > 0 ? (
@@ -204,6 +226,12 @@ export function VisualAnalytics({
           )}
         </CardContent>
       </Card>
+
+      <QuickEditThresholdsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialTab="key8"
+      />
     </div>
   );
 }

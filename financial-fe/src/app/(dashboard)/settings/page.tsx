@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ruleSettingsService } from "@/features/rules/services";
+import {
+  useRatioThresholds,
+  RatioThresholdConfig,
+  DEFAULT_RATIO_THRESHOLDS,
+  RatioCategory,
+} from "@/features/dashboard/threshold-store";
 import type {
   EvaluationCriterion,
   UpdateCriterionRequest,
@@ -35,6 +41,16 @@ import {
   HelpCircle,
   Power,
   RotateCw,
+  LayoutGrid,
+  BarChart3,
+  Layers,
+  RotateCcw,
+  Check,
+  CheckSquare,
+  Square,
+  ArrowUpRight,
+  ArrowDownRight,
+  Info,
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -72,6 +88,83 @@ export default function SettingsPage() {
     type: "success" | "error";
     message: string;
   } | null>(null);
+
+  // Sub-tab for Criteria (3 tabs: 4 KPI, 8 Key Ratios, 14 Matrix)
+  const [criteriaSubTab, setCriteriaSubTab] = useState<"kpi" | "key8" | "matrix14">("kpi");
+  const { thresholds, updateAllThresholds, resetToDefault } = useRatioThresholds();
+  const [localConfigs, setLocalConfigs] = useState<RatioThresholdConfig[]>(thresholds);
+  const [isDirty, setIsDirty] = useState(false);
+
+  useEffect(() => {
+    setLocalConfigs(thresholds);
+    setIsDirty(false);
+  }, [thresholds]);
+
+  const handleConfigValueChange = (code: string, field: keyof RatioThresholdConfig, value: any) => {
+    setLocalConfigs((prev) =>
+      prev.map((c) => (c.code === code ? { ...c, [field]: value } : c))
+    );
+    setIsDirty(true);
+  };
+
+  const handleToggleKeyRatio = (code: string) => {
+    const currentSelected = localConfigs.filter((c) => c.isKeyRatio);
+    const target = localConfigs.find((c) => c.code === code);
+    if (!target) return;
+
+    if (!target.isKeyRatio && currentSelected.length >= 8) {
+      setNotification({
+        type: "error",
+        message: "Biểu đồ so sánh tối đa 8 tỷ số trọng yếu. Vui lòng bỏ chọn một chỉ số khác trước khi chọn thêm.",
+      });
+      return;
+    }
+
+    setLocalConfigs((prev) =>
+      prev.map((c) => (c.code === code ? { ...c, isKeyRatio: !c.isKeyRatio } : c))
+    );
+    setIsDirty(true);
+  };
+
+  const handleSaveAllThresholds = () => {
+    updateAllThresholds(localConfigs);
+    setIsDirty(false);
+    queryClient.invalidateQueries({ queryKey: ["dashboard-overview"] });
+    setNotification({
+      type: "success",
+      message: "Đã lưu toàn bộ cấu hình mốc tham chiếu và cập nhật màu sắc Dashboard thành công!",
+    });
+
+    localConfigs.forEach((lc) => {
+      const matched = criteria.find((c) => c.ratioCode === lc.code);
+      if (matched && lc.safeThreshold !== undefined) {
+        ruleSettingsService
+          .updateCriterion(matched.id, {
+            criterionName: matched.criterionName,
+            comparisonOperator:
+              lc.direction === "LOWER_IS_BETTER"
+                ? "LESS_THAN_OR_EQUAL"
+                : "GREATER_THAN_OR_EQUAL",
+            thresholdValue: lc.safeThreshold,
+            unit: lc.unit as any,
+            description: lc.description,
+            isActive: true,
+          })
+          .catch(() => {});
+      }
+    });
+  };
+
+  const handleResetToTT200 = () => {
+    resetToDefault();
+    setLocalConfigs(DEFAULT_RATIO_THRESHOLDS);
+    setIsDirty(false);
+    queryClient.invalidateQueries({ queryKey: ["dashboard-overview"] });
+    setNotification({
+      type: "success",
+      message: "Đã khôi phục toàn bộ 14 chỉ số tài chính về ngưỡng chuẩn mực mặc định TT200!",
+    });
+  };
 
   // 1. Query Criteria
   const {
@@ -326,254 +419,477 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {/* TAB 1: TIÊU CHÍ ĐÁNH GIÁ TỶ SỐ */}
+      {/* TAB 1: TIÊU CHÍ ĐÁNH GIÁ TỶ SỐ (CHỨA 3 SUB-TAB ĐIỀU CHỈNH) */}
       {activeTab === "criteria" && (
         <div className="space-y-6">
-          {/* Card Form Chỉnh sửa Tiêu chí */}
-          {editingCriterion && (
-            <Card className="bg-white border-2 border-[#006c49]/40 shadow-sm animate-in fade-in">
-              <CardHeader className="bg-emerald-50/50 border-b border-emerald-100 pb-3 flex flex-row items-center justify-between">
+          {/* Thanh Điều hướng 3 Sub-Tab & Nút Tác vụ */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                onClick={() => setCriteriaSubTab("kpi")}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  criteriaSubTab === "kpi"
+                    ? "bg-[#006c49] text-white shadow-xs"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+                4 KPI Cốt Lõi (Xanh - Vàng - Đỏ)
+              </button>
+
+              <button
+                onClick={() => setCriteriaSubTab("key8")}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  criteriaSubTab === "key8"
+                    ? "bg-[#006c49] text-white shadow-xs"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <BarChart3 className="h-3.5 w-3.5" />
+                8 Tỷ Số Trọng Yếu & Ngưỡng Ngành
+              </button>
+
+              <button
+                onClick={() => setCriteriaSubTab("matrix14")}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  criteriaSubTab === "matrix14"
+                    ? "bg-[#006c49] text-white shadow-xs"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <Layers className="h-3.5 w-3.5" />
+                Ma Trận 14 Chỉ Số (Xanh - Vàng - Đỏ)
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 self-end md:self-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResetToTT200}
+                className="text-xs h-8 gap-1.5 text-slate-600 hover:text-slate-900 border-slate-300"
+                title="Khôi phục toàn bộ 14 chỉ số về chuẩn mực mặc định TT200"
+              >
+                <RotateCcw className="h-3.5 w-3.5 text-slate-500" />
+                Khôi phục chuẩn TT200
+              </Button>
+
+              <Button
+                size="sm"
+                onClick={handleSaveAllThresholds}
+                className={`text-xs h-8 font-bold gap-1.5 px-4 text-white shadow-xs transition-all ${
+                  isDirty
+                    ? "bg-amber-600 hover:bg-amber-700 animate-pulse"
+                    : "bg-[#006c49] hover:bg-[#005237]"
+                }`}
+              >
+                <Save className="h-3.5 w-3.5" />
+                {isDirty ? "Lưu thay đổi *" : "Đã lưu cấu hình"}
+              </Button>
+            </div>
+          </div>
+
+          {/* SUB-TAB 1: 4 CHỈ SỐ KPI CỐT LÕI */}
+          {criteriaSubTab === "kpi" && (
+            <div className="space-y-4">
+              <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100 text-xs text-emerald-900 flex items-start gap-2">
+                <Info className="h-4 w-4 text-[#006c49] shrink-0 mt-0.5" />
                 <div>
-                  <CardTitle className="text-sm font-bold text-[#006c49]">
-                    Hiệu chỉnh Ngưỡng Tiêu chí: {editingCriterion.ratioName}
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Mã tỷ số:{" "}
-                    <code className="font-mono font-bold text-slate-800">
-                      {editingCriterion.ratioCode}
-                    </code>
-                  </CardDescription>
+                  <span className="font-bold">4 Chỉ số KPI Cốt lõi (Scoreboard điều hành):</span> Thiết lập 2 mốc ngưỡng để hệ thống tự động phân loại 3 màu: <strong>Xanh (An toàn)</strong>, <strong>Vàng (Lưu ý)</strong>, <strong>Đỏ (Cảnh báo)</strong>. Các mốc này được đồng bộ trực tiếp với Ma trận 14 chỉ số.
                 </div>
+              </div>
 
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setEditingCriterion(null)}
-                  className="h-7 text-xs text-slate-500"
-                >
-                  <X className="h-4 w-4 mr-1" /> Hủy
-                </Button>
-              </CardHeader>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {localConfigs
+                  .filter((c) => c.isCoreKpi)
+                  .map((item) => {
+                    const unitSuffix = item.unit === "PERCENT" ? "%" : item.unit === "DAYS" ? " ngày" : "x";
+                    const isHigher = item.direction === "HIGHER_IS_BETTER";
 
-              <CardContent className="p-5 space-y-4 text-xs">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <label className="font-semibold text-slate-700">
-                      Tên tiêu chí hiển thị
-                    </label>
-                    <Input
-                      value={criterionForm.criterionName}
-                      onChange={(e) =>
-                        setCriterionForm({
-                          ...criterionForm,
-                          criterionName: e.target.value,
-                        })
-                      }
-                      className="text-xs h-9"
-                    />
-                  </div>
+                    return (
+                      <Card key={item.code} className="bg-white border border-slate-200 shadow-xs hover:border-[#006c49]/40 transition-colors">
+                        <CardHeader className="pb-3 border-b border-slate-100">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <Badge variant="outline" className="text-[10px] uppercase font-bold text-slate-500 mb-1">
+                                {item.categoryName}
+                              </Badge>
+                              <CardTitle className="text-sm font-bold text-slate-900">
+                                {item.name}
+                              </CardTitle>
+                              <p className="text-[11px] font-mono text-slate-400 mt-0.5">
+                                {item.formula}
+                              </p>
+                            </div>
 
-                  <div className="space-y-1">
-                    <label className="font-semibold text-slate-700">
-                      Toán tử so sánh
-                    </label>
-                    <select
-                      value={criterionForm.comparisonOperator}
-                      onChange={(e) =>
-                        setCriterionForm({
-                          ...criterionForm,
-                          comparisonOperator: e.target
-                            .value as ComparisonOperator,
-                        })
-                      }
-                      className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#006c49]"
-                    >
-                      <option value="GREATER_THAN_OR_EQUAL">
-                        Lớn hơn hoặc bằng (≥)
-                      </option>
-                      <option value="LESS_THAN_OR_EQUAL">
-                        Nhỏ hơn hoặc bằng (≤)
-                      </option>
-                      <option value="GREATER_THAN">Lớn hơn (&gt;)</option>
-                      <option value="LESS_THAN">Nhỏ hơn (&lt;)</option>
-                      <option value="EQUAL">Bằng (=)</option>
-                    </select>
-                  </div>
+                            <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">
+                              {item.code}
+                            </span>
+                          </div>
+                        </CardHeader>
 
-                  <div className="space-y-1">
-                    <label className="font-semibold text-slate-700">
-                      Ngưỡng an toàn ({formatUnit(criterionForm.unit)})
-                    </label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={criterionForm.thresholdValue}
-                      onChange={(e) =>
-                        setCriterionForm({
-                          ...criterionForm,
-                          thresholdValue: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      className="text-xs h-9 font-mono font-bold"
-                    />
-                  </div>
-                </div>
+                        <CardContent className="p-4 space-y-4 text-xs">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5 p-2.5 rounded-lg bg-emerald-50/50 border border-emerald-200/60">
+                              <label className="font-bold text-emerald-900 flex items-center gap-1.5 text-[11px]">
+                                <span className="h-2 w-2 rounded-full bg-[#22c55e]" />
+                                Mốc An Toàn (Xanh)
+                              </label>
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  value={item.safeThreshold}
+                                  onChange={(e) =>
+                                    handleConfigValueChange(
+                                      item.code,
+                                      "safeThreshold",
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  className="h-8 text-xs font-mono font-bold pr-7 bg-white border-emerald-300 focus-visible:ring-emerald-500"
+                                />
+                                <span className="absolute right-2 top-2 text-[11px] text-slate-400 font-bold pointer-events-none">
+                                  {unitSuffix}
+                                </span>
+                              </div>
+                              <span className="text-[10px] text-emerald-700 block">
+                                {isHigher ? `Đạt từ ≥ ${item.safeThreshold}${unitSuffix}` : `Tối đa ≤ ${item.safeThreshold}${unitSuffix}`}
+                              </span>
+                            </div>
 
-                <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">
-                    Ý nghĩa kinh tế & Hướng dẫn nhận định
-                  </label>
-                  <Input
-                    value={criterionForm.description || ""}
-                    onChange={(e) =>
-                      setCriterionForm({
-                        ...criterionForm,
-                        description: e.target.value,
-                      })
-                    }
-                    placeholder="Mô tả ý nghĩa của ngưỡng an toàn đối với doanh nghiệp..."
-                    className="text-xs h-9"
-                  />
-                </div>
+                            <div className="space-y-1.5 p-2.5 rounded-lg bg-amber-50/50 border border-amber-200/60">
+                              <label className="font-bold text-amber-900 flex items-center gap-1.5 text-[11px]">
+                                <span className="h-2 w-2 rounded-full bg-[#f59e0b]" />
+                                Mốc Lưu Ý (Vàng)
+                              </label>
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  value={item.warningThreshold}
+                                  onChange={(e) =>
+                                    handleConfigValueChange(
+                                      item.code,
+                                      "warningThreshold",
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  className="h-8 text-xs font-mono font-bold pr-7 bg-white border-amber-300 focus-visible:ring-amber-500"
+                                />
+                                <span className="absolute right-2 top-2 text-[11px] text-slate-400 font-bold pointer-events-none">
+                                  {unitSuffix}
+                                </span>
+                              </div>
+                              <span className="text-[10px] text-amber-700 block">
+                                {isHigher ? `Cận chuẩn ≥ ${item.warningThreshold}${unitSuffix}` : `Cận chuẩn ≤ ${item.warningThreshold}${unitSuffix}`}
+                              </span>
+                            </div>
+                          </div>
 
-                <div className="flex items-center justify-between pt-2">
-                  <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
-                    <input
-                      type="checkbox"
-                      checked={criterionForm.isActive}
-                      onChange={(e) =>
-                        setCriterionForm({
-                          ...criterionForm,
-                          isActive: e.target.checked,
-                        })
-                      }
-                      className="rounded border-slate-300 text-[#006c49] focus:ring-[#006c49] h-4 w-4"
-                    />
-                    Kích hoạt tiêu chí này trong đánh giá sức khỏe tài chính
-                  </label>
+                          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                            <div className="text-slate-500">
+                              Dưới mức lưu ý:{" "}
+                              <span className="font-bold text-rose-600">
+                                {isHigher ? `< ${item.warningThreshold}${unitSuffix} (Cảnh báo)` : `> ${item.warningThreshold}${unitSuffix} (Cảnh báo)`}
+                              </span>
+                            </div>
 
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingCriterion(null)}
-                      className="text-xs h-8"
-                    >
-                      Hủy bỏ
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        if (editingCriterion) {
-                          updateCriterionMutation.mutate({
-                            id: editingCriterion.id,
-                            data: criterionForm,
-                          });
-                        }
-                      }}
-                      disabled={updateCriterionMutation.isPending}
-                      className="bg-[#006c49] hover:bg-[#005237] text-white text-xs h-8 font-semibold gap-1 px-4 shadow-xs"
-                    >
-                      {updateCriterionMutation.isPending ? (
-                        <>
-                          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                          Đang lưu...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-3.5 w-3.5 mr-1" />
-                          Lưu tiêu chí
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                            <div className="flex items-center gap-1">
+                              <Badge variant="safe" className="text-[9px] px-1.5 py-0">XANH</Badge>
+                              <Badge variant="warning" className="text-[9px] px-1.5 py-0">VÀNG</Badge>
+                              <Badge variant="danger" className="text-[9px] px-1.5 py-0">ĐỎ</Badge>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+              </div>
+            </div>
           )}
 
-          {/* Danh sách Tiêu chí */}
-          <Card className="bg-white border border-slate-200 shadow-xs">
-            <CardHeader className="border-b border-slate-100 pb-3 flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-sm font-semibold text-slate-900">
-                  Danh mục Ngưỡng An toàn Chỉ số Tài chính
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  Áp dụng trực tiếp cho 4 KPI sống còn và Ma trận rủi ro trên Dashboard
-                </CardDescription>
-              </div>
-            </CardHeader>
-
-            <CardContent className="p-0">
-              {isCriteriaLoading ? (
-                <div className="p-6 space-y-3">
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-              ) : criteria.length === 0 ? (
-                <div className="p-8 text-center text-slate-400 text-xs">
-                  Không có tiêu chí đánh giá nào.
-                </div>
-              ) : (
-                <div className="divide-y divide-slate-100 text-xs">
-                  {criteria.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/80 transition-colors"
-                    >
-                      <div className="space-y-1 min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-slate-900 text-sm">
-                            {item.ratioName}
-                          </span>
-                          <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold">
-                            {item.ratioCode}
-                          </span>
-                          {item.isActive ? (
-                            <Badge variant="safe" className="text-[10px]">
-                              HOẠT ĐỘNG
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-[10px] text-slate-400">
-                              TẠM DỪNG
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-slate-500 text-xs leading-relaxed">
-                          {item.description || item.criterionName}
-                        </p>
+          {/* SUB-TAB 2: 8 TỶ SỐ TRỌNG YẾU & NGƯỠNG NGÀNH */}
+          {criteriaSubTab === "key8" && (
+            <div className="space-y-4">
+              {(() => {
+                const selectedCount = localConfigs.filter((c) => c.isKeyRatio).length;
+                return (
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                    <div className="space-y-0.5">
+                      <div className="font-bold text-slate-800">
+                        Cấu hình Biểu đồ so sánh 8 tỷ số vs Ngưỡng an toàn ngành
                       </div>
-
-                      <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                        <div className="text-right">
-                          <div className="text-[11px] text-slate-400 font-medium">
-                            Ngưỡng an toàn
-                          </div>
-                          <div className="font-mono font-bold text-sm text-[#006c49]">
-                            {formatOperator(item.comparisonOperator)}{" "}
-                            {item.thresholdValue}{" "}
-                            {formatUnit(item.unit)}
-                          </div>
-                        </div>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenEditCriterion(item)}
-                          className="h-8 text-xs font-semibold text-[#006c49] border-emerald-200 hover:bg-emerald-50 gap-1 px-3"
-                        >
-                          <Edit3 className="h-3.5 w-3.5" />
-                          Sửa
-                        </Button>
-                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Chọn 8 tỷ số tài chính tiêu biểu để hiển thị trên biểu đồ nhóm cột và nhập giá trị Ngưỡng ngành (Benchmark) tham chiếu.
+                      </p>
                     </div>
-                  ))}
+
+                    <Badge
+                      variant={selectedCount === 8 ? "safe" : "warning"}
+                      className="text-xs font-mono font-bold shrink-0 self-start sm:self-center"
+                    >
+                      Đã chọn: {selectedCount}/8 chỉ số
+                    </Badge>
+                  </div>
+                );
+              })()}
+
+              <Card className="bg-white border border-slate-200 shadow-xs overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th className="p-3 w-12 text-center">Hiển thị</th>
+                        <th className="p-3">Tỷ số tài chính</th>
+                        <th className="p-3">Nhóm</th>
+                        <th className="p-3">Công thức</th>
+                        <th className="p-3 w-44">Ngưỡng ngành (Benchmark)</th>
+                        <th className="p-3 text-right">Trạng thái biểu đồ</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {localConfigs.map((item) => {
+                        const unitSuffix = item.unit === "PERCENT" ? "%" : item.unit === "DAYS" ? " ngày" : "x";
+
+                        return (
+                          <tr
+                            key={item.code}
+                            className={`transition-colors ${
+                              item.isKeyRatio ? "bg-emerald-50/20 hover:bg-emerald-50/40" : "hover:bg-slate-50/60"
+                            }`}
+                          >
+                            <td className="p-3 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleKeyRatio(item.code)}
+                                className="text-[#006c49] hover:opacity-80 transition-opacity"
+                              >
+                                {item.isKeyRatio ? (
+                                  <CheckSquare className="h-5 w-5 text-[#006c49]" />
+                                ) : (
+                                  <Square className="h-5 w-5 text-slate-300 hover:text-slate-400" />
+                                )}
+                              </button>
+                            </td>
+
+                            <td className="p-3">
+                              <div className="font-bold text-slate-900">{item.name}</div>
+                              <div className="font-mono text-[10px] text-slate-400">{item.code}</div>
+                            </td>
+
+                            <td className="p-3">
+                              <Badge variant="outline" className="text-[10px]">
+                                {item.categoryName}
+                              </Badge>
+                            </td>
+
+                            <td className="p-3 text-slate-500 font-mono text-[11px]">
+                              {item.formula}
+                            </td>
+
+                            <td className="p-3">
+                              <div className="relative max-w-[150px]">
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  value={item.industryBenchmark}
+                                  onChange={(e) =>
+                                    handleConfigValueChange(
+                                      item.code,
+                                      "industryBenchmark",
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  className="h-8 text-xs font-mono font-bold pr-7 bg-white"
+                                />
+                                <span className="absolute right-2 top-2 text-[11px] text-slate-400 font-bold pointer-events-none">
+                                  {unitSuffix}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="p-3 text-right">
+                              {item.isKeyRatio ? (
+                                <Badge variant="safe" className="text-[10px]">
+                                  HIỂN THỊ
+                                </Badge>
+                              ) : (
+                                <span className="text-[11px] text-slate-400">Ẩn</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </Card>
+            </div>
+          )}
+
+          {/* SUB-TAB 3: MA TRẬN CẢNH BÁO 14 CHỈ SỐ */}
+          {criteriaSubTab === "matrix14" && (
+            <div className="space-y-6">
+              <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-100 text-xs text-blue-900 flex items-start gap-2">
+                <Info className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold">Ma trận Cảnh báo 14 Chỉ số (Toàn diện TT200):</span> Quản lý đồng bộ cả 14 chỉ số tài chính thuộc 4 nhóm. Thiết lập ngưỡng An toàn (Xanh) và ngưỡng Lưu ý (Vàng) giúp Dashboard hiển thị đúng màu sắc cho từng chỉ số.
+                </div>
+              </div>
+
+              {(
+                [
+                  { key: "LIQUIDITY", title: "1. NHÓM THANH KHOẢN (LIQUIDITY)" },
+                  { key: "SOLVENCY", title: "2. NHÓM ĐÒN BẨY & NỢ (SOLVENCY)" },
+                  { key: "PROFITABILITY", title: "3. NHÓM HIỆU SUẤT SINH LỜI (PROFITABILITY)" },
+                  { key: "EFFICIENCY", title: "4. NHÓM HIỆU QUẢ HOẠT ĐỘNG (EFFICIENCY)" },
+                ] as const
+              ).map((group) => {
+                const groupItems = localConfigs.filter((c) => c.category === group.key);
+
+                return (
+                  <Card key={group.key} className="bg-white border border-slate-200 shadow-xs overflow-hidden">
+                    <CardHeader className="bg-slate-50/70 border-b border-slate-200/80 py-2.5 px-4 flex flex-row items-center justify-between">
+                      <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                        {group.title}
+                      </CardTitle>
+                      <Badge variant="outline" className="text-[10px]">
+                        {groupItems.length} chỉ số
+                      </Badge>
+                    </CardHeader>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs text-left">
+                        <thead className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
+                          <tr>
+                            <th className="p-3">Tỷ số & Công thức</th>
+                            <th className="p-3 w-32">Hướng đánh giá</th>
+                            <th className="p-3 w-36 text-emerald-800">Ngưỡng An Toàn (Xanh)</th>
+                            <th className="p-3 w-36 text-amber-800">Ngưỡng Lưu Ý (Vàng)</th>
+                            <th className="p-3 w-36 text-slate-800">Ngưỡng Ngành</th>
+                            <th className="p-3 text-right">Phân loại dải màu</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {groupItems.map((item) => {
+                            const unitSuffix = item.unit === "PERCENT" ? "%" : item.unit === "DAYS" ? " ngày" : "x";
+                            const isHigher = item.direction === "HIGHER_IS_BETTER";
+
+                            return (
+                              <tr key={item.code} className="hover:bg-slate-50/60 transition-colors">
+                                <td className="p-3">
+                                  <div className="font-bold text-slate-900">{item.name}</div>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="font-mono text-[10px] text-slate-400">{item.code}</span>
+                                    <span className="text-slate-300">•</span>
+                                    <span className="font-mono text-[10px] text-slate-500">{item.formula}</span>
+                                  </div>
+                                </td>
+
+                                <td className="p-3">
+                                  <div className="flex items-center gap-1 text-[11px] font-medium text-slate-600">
+                                    {isHigher ? (
+                                      <>
+                                        <ArrowUpRight className="h-3.5 w-3.5 text-emerald-600" />
+                                        <span>Càng cao càng tốt</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <ArrowDownRight className="h-3.5 w-3.5 text-rose-600" />
+                                        <span>Càng thấp càng tốt</span>
+                                      </>
+                                    )}
+                                  </div>
+                                </td>
+
+                                <td className="p-3">
+                                  <div className="relative">
+                                    <Input
+                                      type="number"
+                                      step="0.01"
+                                      value={item.safeThreshold}
+                                      onChange={(e) =>
+                                        handleConfigValueChange(
+                                          item.code,
+                                          "safeThreshold",
+                                          parseFloat(e.target.value) || 0
+                                        )
+                                      }
+                                      className="h-8 text-xs font-mono font-bold pr-7 bg-emerald-50/30 border-emerald-300 focus-visible:ring-emerald-500"
+                                    />
+                                    <span className="absolute right-2 top-2 text-[11px] text-emerald-700 font-bold pointer-events-none">
+                                      {unitSuffix}
+                                    </span>
+                                  </div>
+                                </td>
+
+                                <td className="p-3">
+                                  <div className="relative">
+                                    <Input
+                                      type="number"
+                                      step="0.01"
+                                      value={item.warningThreshold}
+                                      onChange={(e) =>
+                                        handleConfigValueChange(
+                                          item.code,
+                                          "warningThreshold",
+                                          parseFloat(e.target.value) || 0
+                                        )
+                                      }
+                                      className="h-8 text-xs font-mono font-bold pr-7 bg-amber-50/30 border-amber-300 focus-visible:ring-amber-500"
+                                    />
+                                    <span className="absolute right-2 top-2 text-[11px] text-amber-700 font-bold pointer-events-none">
+                                      {unitSuffix}
+                                    </span>
+                                  </div>
+                                </td>
+
+                                <td className="p-3">
+                                  <div className="relative">
+                                    <Input
+                                      type="number"
+                                      step="0.01"
+                                      value={item.industryBenchmark}
+                                      onChange={(e) =>
+                                        handleConfigValueChange(
+                                          item.code,
+                                          "industryBenchmark",
+                                          parseFloat(e.target.value) || 0
+                                        )
+                                      }
+                                      className="h-8 text-xs font-mono font-bold pr-7 bg-white"
+                                    />
+                                    <span className="absolute right-2 top-2 text-[11px] text-slate-400 font-bold pointer-events-none">
+                                      {unitSuffix}
+                                    </span>
+                                  </div>
+                                </td>
+
+                                <td className="p-3 text-right">
+                                  <div className="flex items-center justify-end gap-1">
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#22c55e] text-white">
+                                      {isHigher ? `≥ ${item.safeThreshold}` : `≤ ${item.safeThreshold}`}
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#f59e0b] text-white">
+                                      {isHigher ? `≥ ${item.warningThreshold}` : `≤ ${item.warningThreshold}`}
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#ef4444] text-white">
+                                      {isHigher ? `< ${item.warningThreshold}` : `> ${item.warningThreshold}`}
+                                    </span>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
